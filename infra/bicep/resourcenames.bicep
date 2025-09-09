@@ -117,7 +117,7 @@ output subnetScoringName string           = toLower('snet-scoring')
 // computer 1: vmoazotaihubda1  (first 15 characters)
 // resource 2: vmoazotaihubdam02
 // computer 2: vmoazotaihubda2  (first 15 characters)
-output vm_name string           = toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${regionCode}${instance}')
+output vm_name string           = toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${instance}')
 output vm_name_15 string        = take(toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${partialRegion}${partialInstance}'),15)
                                                     
 output vm_nic_name string       = toLower('${resourceAbbreviations.networkNetworkInterfaces}${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}')
@@ -128,8 +128,8 @@ output bastion_host_name string = toLower('${resourceAbbreviations.networkBastio
 output bastion_pip_name string  = toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}')
 
 output project_vm object = {
-  vm_name:                        toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${regionCode}${projectNumber}')
-  vm_name_15:                     take(toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${regionCode}${projectNumber}'),15)
+  vm_name:                        toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${projectNumber}')
+  vm_name_15:                     take(toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${projectNumber}'),15)
   vm_nic_name:                    toLower('${resourceAbbreviations.networkNetworkInterfaces}${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
   vm_pip_name:                    toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
   vm_os_disk_name:                toLower('${resourceAbbreviations.computeDisks}-${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
@@ -140,23 +140,23 @@ output project_vm object = {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Private Endpoint Names (sequential) -- created for the customer need
-output peStorageAccountBlobName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-001')
-output peStorageAccountTableName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-002')
-output peStorageAccountQueueName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-003')
-output peCosmosDbName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-004')
-output peKeyVaultName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-005')
-output peAcrName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-006')
-output peSearchServiceName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-007')
-output peOpenAIName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-008')
-output peContainerAppsName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-009')
+output peStorageAccountBlobName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-001')
+output peStorageAccountTableName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-002')
+output peStorageAccountQueueName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-003')
+output peCosmosDbName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-004')
+output peKeyVaultName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-005')
+output peAcrName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-006')
+output peSearchServiceName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-007')
+output peOpenAIName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-008')
+output peContainerAppsName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-009')
 
-output peDocumentIntelligenceName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-010')
-output peOpenAIServiceConnection string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-011')
-output peAIHubName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-012')
-output peAppInsightsName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-013')
-output peMonitorName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-014')
+output peDocumentIntelligenceName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-010')
+output peOpenAIServiceConnection string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-011')
+output peAIHubName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-012')
+output peAppInsightsName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-013')
+output peMonitorName string = toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-014')
 
-output vnetNsgName string = toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}-${regionCode}-001')
+output vnetNsgName string = toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}-001')
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Application Gateway resource names
