@@ -146,7 +146,7 @@ jobs:
           echo "DTS=$DTS"
           echo "DTS=$DTS" >> $GITHUB_OUTPUT
 
-          ENVIRONMENT_CODE="$(echo "${{ inputs.envCode }}""
+          ENVIRONMENT_CODE="$(echo "${{ inputs.envCode }}" | tr '[:upper:]' '[:lower:]')"
           echo "ENVIRONMENT_CODE=$ENVIRONMENT_CODE"
           echo "ENVIRONMENT_CODE=$ENVIRONMENT_CODE" >> $GITHUB_OUTPUT
 
