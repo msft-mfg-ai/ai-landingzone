@@ -146,6 +146,10 @@ jobs:
           echo "DTS=$DTS"
           echo "DTS=$DTS" >> $GITHUB_OUTPUT
 
+          ENVIRONMENT_CODE="$(echo "${{ inputs.envCode }}""
+          echo "ENVIRONMENT_CODE=$ENVIRONMENT_CODE"
+          echo "ENVIRONMENT_CODE=$ENVIRONMENT_CODE" >> $GITHUB_OUTPUT
+
           ENV_INITIAL="$(echo "${{ inputs.envCode }}" | cut -c1)"
           echo "ENV_INITIAL=$ENV_INITIAL"
           echo "ENV_INITIAL=$ENV_INITIAL" >> $GITHUB_OUTPUT
@@ -165,6 +169,7 @@ jobs:
       - name: Display Variables and Files
         run: |-
           echo "inputs.envCode=${{ inputs.envCode }}"
+          echo "step.ENVIRONMENT_CODE=${{ steps.create-vars.outputs.ENVIRONMENT_CODE }}"
           echo "step.resourceGroupName=${{ steps.create-vars.outputs.RESOURCEGROUPNAME }}"
           echo "step.ROOTRESOURCEGROUPNAME=${{ steps.create-vars.outputs.ROOTRESOURCEGROUPNAME }}"
           echo "deployInResourceGroup=${{ inputs.deployInResourceGroup }}"
