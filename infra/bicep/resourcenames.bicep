@@ -52,52 +52,52 @@ var partialRegion = substring(regionCode, 0, 1) // get first digit of a two digi
 var resourceAbbreviations = loadJsonContent('./data/abbreviation.json')
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-output webSiteName string                 = toLower('${resourceAbbreviations.webSitesAppService}-${sanitizedAppNameWithDashes}-${environmentInitial}${resourceTokenWithDash}')
-output webSiteAppServicePlanName string   = toLower('${resourceAbbreviations.webServerFarms}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
-output appInsightsName string             = toLower('${resourceAbbreviations.insightsComponents}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
-output logAnalyticsWorkspaceName string   = toLower('${resourceAbbreviations.operationalInsightsWorkspaces}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
+output webSiteName string                 = toLower('${resourceAbbreviations.webSitesAppService}-${sanitizedAppNameWithDashes}-${sanitizedEnvironment}${resourceTokenWithDash}')
+output webSiteAppServicePlanName string   = toLower('${resourceAbbreviations.webServerFarms}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
+output appInsightsName string             = toLower('${resourceAbbreviations.insightsComponents}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
+output logAnalyticsWorkspaceName string   = toLower('${resourceAbbreviations.operationalInsightsWorkspaces}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
 
-output cosmosName string                  = toLower('${resourceAbbreviations.documentDBDatabaseAccounts}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
+output cosmosName string                  = toLower('${resourceAbbreviations.documentDBDatabaseAccounts}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
 
-output apimName string                    = toLower('${resourceAbbreviations.apiManagementService}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
+output apimName string                    = toLower('${resourceAbbreviations.apiManagementService}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
 
-output searchServiceName string           = toLower('${resourceAbbreviations.searchSearchServices}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
-output cogServiceName string              = toLower('${resourceAbbreviations.cognitiveServicesFoundry}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
-output documentIntelligenceName string    = toLower('${resourceAbbreviations.documentIntelligence}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
-output rootCogServiceName string          = toLower('${resourceAbbreviations.cognitiveServicesFoundry}-${sanitizedRootApplication}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
+output searchServiceName string           = toLower('${resourceAbbreviations.searchSearchServices}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
+output cogServiceName string              = toLower('${resourceAbbreviations.cognitiveServicesFoundry}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
+output documentIntelligenceName string    = toLower('${resourceAbbreviations.documentIntelligence}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
+output rootCogServiceName string          = toLower('${resourceAbbreviations.cognitiveServicesFoundry}-${sanitizedRootApplication}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
 
-output aiHubName string                   = toLower('${resourceAbbreviations.cognitiveServicesAIHub}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}')
+output aiHubName string                   = toLower('${resourceAbbreviations.cognitiveServicesAIHub}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}')
 // AI Hub Project name must be alpha numeric characters or '-', length must be <= 32
-func getProjectName(no int) string => take(toLower('${resourceAbbreviations.cognitiveServicesFoundryProject}-${sanitizedAppName}-${no}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
+func getProjectName(no int) string => take(toLower('${resourceAbbreviations.cognitiveServicesFoundryProject}-${sanitizedAppName}-${no}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
 var aiProjectNames = [for i in range(1, numberOfProjects + 1): getProjectName(i)]
 
 output aiHubProjectNames array = aiProjectNames
 output aiHubProjectName string            = getProjectName(projectNumber) // Use the first project name as the AI Hub Project name
 
-output aiHubFoundryProjectName string     = take(toLower('${resourceAbbreviations.cognitiveServicesFoundryProject}-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
+output aiHubFoundryProjectName string     = take(toLower('${resourceAbbreviations.cognitiveServicesFoundryProject}-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
 
-output caManagedEnvName string            = toLower('${resourceAbbreviations.appManagedEnvironments}-${sanitizedAppName}-${environmentInitial}${resourceToken}${dashRegionDashInstance}')
+output caManagedEnvName string            = toLower('${resourceAbbreviations.appManagedEnvironments}-${sanitizedAppName}-${sanitizedEnvironment}${resourceToken}${dashRegionDashInstance}')
 // CA name must be lower case alpha or '-', must start and end with alpha, cannot have '--', length must be <= 32
-output containerAppAPIName string         = take(toLower('${resourceAbbreviations.appContainerApps}-api-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
-output containerAppUIName string          = take(toLower('${resourceAbbreviations.appContainerApps}-ui-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
-output containerAppBatchName string       = take(toLower('${resourceAbbreviations.appContainerApps}-bat-${sanitizedAppName}-${environmentInitial}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
+output containerAppAPIName string         = take(toLower('${resourceAbbreviations.appContainerApps}-api-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
+output containerAppUIName string          = take(toLower('${resourceAbbreviations.appContainerApps}-ui-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
+output containerAppBatchName string       = take(toLower('${resourceAbbreviations.appContainerApps}-bat-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
 
-output caManagedIdentityName string       = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedAppName}-${resourceAbbreviations.appManagedEnvironments}-${environmentInitial}${dashRegionDashInstance}')
-output kvManagedIdentityName string       = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedAppName}-${resourceAbbreviations.keyVaultVaults}-${environmentInitial}${dashRegionDashInstance}')
-output userAssignedIdentityName string    = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedAppName}-${environmentInitial}${dashRegionDashInstance}')
-output rootUserAssignedIdentityName string = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedRootApplication}-${environmentInitial}${dashRegionDashInstance}')
+output caManagedIdentityName string       = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedAppName}-${resourceAbbreviations.appManagedEnvironments}-${sanitizedEnvironment}${dashRegionDashInstance}')
+output kvManagedIdentityName string       = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedAppName}-${resourceAbbreviations.keyVaultVaults}-${sanitizedEnvironment}${dashRegionDashInstance}')
+output userAssignedIdentityName string    = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedAppName}-${sanitizedEnvironment}${dashRegionDashInstance}')
+output rootUserAssignedIdentityName string = toLower('${resourceAbbreviations.managedIdentityUserAssignedIdentities}-${sanitizedRootApplication}-${sanitizedEnvironment}${dashRegionDashInstance}')
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Container Registry, Key Vaults and Storage Account names are only alpha numeric characters limited length
-output ACR_Name string                    = take('${resourceAbbreviations.containerRegistryRegistries}${sanitizedAppName}${environmentInitial}${resourceTokenWithoutDash}${regionInstance}', 50)
-output keyVaultName string                = take('${resourceAbbreviations.keyVaultVaults}${sanitizedAppName}${environmentInitial}${resourceTokenWithoutDash}${regionInstance}', 24)
-output storageAccountName string          = take('${resourceAbbreviations.storageStorageAccounts}${sanitizedAppName}${environmentInitial}${resourceTokenWithoutDash}${regionInstance}', 24)
+output ACR_Name string                    = take('${resourceAbbreviations.containerRegistryRegistries}${sanitizedAppName}${sanitizedEnvironment}${resourceTokenWithoutDash}${regionInstance}', 50)
+output keyVaultName string                = take('${resourceAbbreviations.keyVaultVaults}${sanitizedAppName}${sanitizedEnvironment}${resourceTokenWithoutDash}${regionInstance}', 24)
+output storageAccountName string          = take('${resourceAbbreviations.storageStorageAccounts}${sanitizedAppName}${sanitizedEnvironment}${resourceTokenWithoutDash}${regionInstance}', 24)
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Network resource names
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-output vnet_Name string                   = toLower('${resourceAbbreviations.networkVirtualNetworks}-${sanitizedAppName}-${environmentInitial}${dashRegionDashInstance}')
-output root_vnet_Name string              = toLower('${resourceAbbreviations.networkVirtualNetworks}-${sanitizedRootApplication}-${environmentInitial}${dashRegionDashInstance}')
+output vnet_Name string                   = toLower('${resourceAbbreviations.networkVirtualNetworks}-${sanitizedAppName}-${sanitizedEnvironment}${dashRegionDashInstance}')
+output root_vnet_Name string              = toLower('${resourceAbbreviations.networkVirtualNetworks}-${sanitizedRootApplication}-${sanitizedEnvironment}${dashRegionDashInstance}')
                                
 output subnetAppGwName string             = toLower('snet-app-gateway')
 output subnetAppSeName string             = toLower('snet-app-services')
