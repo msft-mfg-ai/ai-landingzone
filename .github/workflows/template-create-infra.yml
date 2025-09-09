@@ -76,12 +76,10 @@ on:
         default: 'create'
       projectName:
         description: AIF Project Name
-        required: true
         default: ''
         type: string
       projectNumber:
         description: AIF Project Number
-        required: true
         default: '2'
         type: string
 
