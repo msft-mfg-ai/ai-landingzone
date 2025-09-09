@@ -126,7 +126,7 @@ jobs:
           echo "ENV_INITIAL=$ENV_INITIAL"
           echo "ENV_INITIAL=$ENV_INITIAL" >> $GITHUB_OUTPUT
 
-          RESOURCE_GROUP_NAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-$ENV_INITIAL-${{ vars.GLOBAL_REGION_CODE }}-${{ vars.INSTANCE_NUMBER }}" | tr '[:lower:]' '[:upper:]')"
+          RESOURCE_GROUP_NAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.deployEnvironment }}" | tr '[:lower:]' '[:upper:]')"
           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME"
           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
 
