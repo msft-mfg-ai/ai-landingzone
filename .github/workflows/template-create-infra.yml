@@ -231,7 +231,7 @@ jobs:
 
       - name: Create Resource Group
         if: ${{ inputs.runCreateInfra && inputs.createResourceGroup }}
-        run: az group create --name ${{ steps.create-vars.outputs.RESOURCEGROUPNAME }} --location ${{ vars.RESOURCEGROUP_LOCATION }} --tags environment-name=${{ inputs.envCode }} Template=${{ inputs.templateFile }} creation-date=${{ steps.create-vars.outputs.DATE_TIME_STAMP }} requestor-name=${{ env.requestor-name }} application-owner=${{ env.application-owner }} business-owner=${{ env.business-owner }} cost-center=${{ env.cost-center }} created-by=${{ env.created-by }}
+        run: az group create --name ${{ steps.create-vars.outputs.RESOURCEGROUPNAME }} --location ${{ vars.RESOURCEGROUP_LOCATION }} --tags environment-name=${{ inputs.envCode }} Template=${{ inputs.templateFile }} creation-date=${{ steps.create-vars.outputs.DTS }} requestor-name=${{ env.requestor-name }} application-owner=${{ env.application-owner }} business-owner=${{ env.business-owner }} cost-center=${{ env.cost-center }} created-by=${{ env.created-by }}
 
       - name: What-If Analysis (RG)
         if: ${{ inputs.runCreateInfra && inputs.deployInResourceGroup && inputs.bicepDeploymentMode == 'whatIf' }}
@@ -239,7 +239,7 @@ jobs:
         run: |
           echo "Running what-if analysis..."
           az deployment group what-if \
-            --name ${{ inputs.templateFile }}-whatif-rg-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.create-vars.outputs.DATE_TIME_STAMP }} \
+            --name ${{ inputs.templateFile }}-whatif-rg-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.create-vars.outputs.DTS }} \
             --resource-group "${{ steps.create-vars.outputs.RESOURCEGROUPNAME }}" \
             --template-file "${{ inputs.templatePath }}${{ inputs.templateFile }}" \
             --parameters "${{ inputs.templatePath }}${{ inputs.parameterFile }}" \
@@ -255,7 +255,7 @@ jobs:
         with:
           scope: subscription
           location: ${{ vars.RESOURCEGROUP_LOCATION }}
-          name: ${{ inputs.templateFile }}-sub-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.create-vars.outputs.DATE_TIME_STAMP}}
+          name: ${{ inputs.templateFile }}-sub-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.create-vars.outputs.DTS}}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.templatePath }}${{ inputs.templateFile }}
           parameters-file: ${{ inputs.templatePath }}${{ inputs.parameterFile }}
@@ -271,7 +271,7 @@ jobs:
         id: deploy-bicep-rg
         with:
           scope: resourceGroup
-          name: ${{ inputs.templateFile }}-rg-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.create-vars.outputs.DATE_TIME_STAMP}}
+          name: ${{ inputs.templateFile }}-rg-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.create-vars.outputs.DTS}}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: ${{ steps.create-vars.outputs.RESOURCEGROUPNAME }}
           template-file: ${{ inputs.templatePath }}${{ inputs.templateFile }}
@@ -289,7 +289,7 @@ jobs:
       #   with:
       #     scope: subscription
       #     region: ${{ vars.RESOURCEGROUP_LOCATION }}
-      #     deploymentName: ${{ inputs.templateFile }}-sub-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.get-date.outputs.DATE_TIME_STAMP}}
+      #     deploymentName: ${{ inputs.templateFile }}-sub-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.get-date.outputs.DTS}}
       #     template: ${{ inputs.templatePath }}${{ inputs.templateFile }}
       #     parameters: ${{ inputs.templatePath }}${{ inputs.parameterFile }}
       #     deploymentMode: ${{ inputs.armDeploymentMode }} # Must be: Incremental | Complete | Validation
@@ -301,7 +301,7 @@ jobs:
       #   with:
       #     scope: resourcegroup
       #     region: ${{ vars.RESOURCEGROUP_LOCATION }}
-      #     deploymentName: ${{ inputs.templateFile }}-rg-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.get-date.outputs.DATE_TIME_STAMP}}
+      #     deploymentName: ${{ inputs.templateFile }}-rg-${{ vars.RESOURCEGROUP_LOCATION }}-${{ steps.get-date.outputs.DTS}}
       #     resourceGroupName: ${{ env.generatedResourceGroupName }}
       #     template: ${{ inputs.templatePath }}${{ inputs.templateFile }}
       #     parameters: ${{ inputs.templatePath }}${{ inputs.parameterFile }}
