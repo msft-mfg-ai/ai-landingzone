@@ -18,8 +18,8 @@ on:
       deployEnvironment:
         description: Environment
         required: true
-        default: 'dev'
         type: environment
+        # default: 'dev'
       runBuildDeployAPI:
         description: Build and Deploy API
         required: false

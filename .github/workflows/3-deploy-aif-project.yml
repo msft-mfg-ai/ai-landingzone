@@ -10,8 +10,8 @@ on:
       deployEnvironment:
         description: Environment
         required: true
-        default: 'dev'
         type: environment
+        # default: 'dev'
       bicepDeploymentMode:
         description: Bicep Mode
         default: create

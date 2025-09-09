@@ -296,21 +296,21 @@ module vnet './modules/networking/vnet.bicep' = {
     newVirtualNetworkName: resourceNames.outputs.vnet_Name
     vnetAddressPrefix: vnetPrefix
     vnetNsgName: resourceNames.outputs.vnetNsgName
-    subnetAppGwName: !empty(subnetAppGwName) ? subnetAppGwName : resourceNames.outputs.subnetAppGwName
+    subnetAppGwName: !empty(subnetAppGwName) ? subnetAppGwName : resourceNames.outputs.subnet.appGwName
     subnetAppGwPrefix: subnetAppGwPrefix 
-    subnetAppSeName: !empty(subnetAppSeName) ? subnetAppSeName : resourceNames.outputs.subnetAppSeName
+    subnetAppSeName: !empty(subnetAppSeName) ? subnetAppSeName : resourceNames.outputs.subnet.appSeName
     subnetAppSePrefix: subnetAppSePrefix
-    subnetPeName: !empty(subnetPeName) ? subnetPeName : resourceNames.outputs.subnetPeName
+    subnetPeName: !empty(subnetPeName) ? subnetPeName : resourceNames.outputs.subnet.peName
     subnetPePrefix: subnetPePrefix
-    subnetAgentName: !empty(subnetAgentName) ? subnetAgentName : resourceNames.outputs.subnetAgentName
+    subnetAgentName: !empty(subnetAgentName) ? subnetAgentName : resourceNames.outputs.subnet.agentName
     subnetAgentPrefix: subnetAgentPrefix
-    subnetBastionName: !empty(subnetBastionName) ? subnetBastionName : resourceNames.outputs.subnetBastionName
+    subnetBastionName: !empty(subnetBastionName) ? subnetBastionName : resourceNames.outputs.subnet.bastionName
     subnetBastionPrefix: subnetBastionPrefix
-    subnetJumpboxName: !empty(subnetJumpboxName) ? subnetJumpboxName : resourceNames.outputs.subnetJumpboxName
+    subnetJumpboxName: !empty(subnetJumpboxName) ? subnetJumpboxName : resourceNames.outputs.subnet.jumpboxName
     subnetJumpboxPrefix: subnetJumpboxPrefix
-    subnetTrainingName: !empty(subnetTrainingName) ? subnetTrainingName : resourceNames.outputs.subnetTrainingName
+    subnetTrainingName: !empty(subnetTrainingName) ? subnetTrainingName : resourceNames.outputs.subnet.trainingName
     subnetTrainingPrefix: subnetTrainingPrefix
-    subnetScoringName: !empty(subnetScoringName) ? subnetScoringName : resourceNames.outputs.subnetScoringName
+    subnetScoringName: !empty(subnetScoringName) ? subnetScoringName : resourceNames.outputs.subnet.scoringName
     subnetScoringPrefix: subnetScoringPrefix
   }
 }
@@ -325,14 +325,14 @@ module virtualMachine './modules/virtualMachine/virtualMachine.bicep' = if (depl
     admin_username: admin_username!
     admin_password: admin_password!
     vnet_id: vnet.outputs.vnetResourceId
-    vm_name: !empty(vm_name) ? vm_name! : resourceNames.outputs.vm_name
-    vm_computer_name: resourceNames.outputs.vm_name_15
-    vm_nic_name: resourceNames.outputs.vm_nic_name
-    vm_pip_name: resourceNames.outputs.vm_pip_name
-    vm_os_disk_name: resourceNames.outputs.vm_os_disk_name
-    vm_nsg_name: resourceNames.outputs.vm_nsg_name
+    vm_name: !empty(vm_name) ? vm_name! : resourceNames.outputs.vm.name
+    vm_computer_name: resourceNames.outputs.vm.name_15
+    vm_nic_name: resourceNames.outputs.vm.nic_name
+    vm_pip_name: resourceNames.outputs.vm.pip_name
+    vm_os_disk_name: resourceNames.outputs.vm.os_disk_name
+    vm_nsg_name: resourceNames.outputs.vm.nsg_name
     
-    subnet_name: !empty(subnetJumpboxName) ? subnetJumpboxName : resourceNames.outputs.subnetJumpboxName
+    subnet_name: !empty(subnetJumpboxName) ? subnetJumpboxName : resourceNames.outputs.subnet.jumpboxName
     // VM configuration
     vm_size: 'Standard_B2s_v2'
     os_disk_size_gb: 128
@@ -355,7 +355,7 @@ module containerRegistry './modules/app/containerregistry.bicep' = if (deployCon
     acrSku: 'Premium'
     tags: tags
     publicAccessEnabled: publicAccessEnabled
-    privateEndpointName: resourceNames.outputs.peAcrName
+    privateEndpointName: resourceNames.outputs.pe.AcrName
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
     myIpAddress: myIpAddress
   }
@@ -384,9 +384,9 @@ module storage './modules/storage/storage-account.bicep' = {
     location: location
     tags: tags
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
-    privateEndpointBlobName: resourceNames.outputs.peStorageAccountBlobName
-    privateEndpointTableName: resourceNames.outputs.peStorageAccountTableName
-    privateEndpointQueueName: resourceNames.outputs.peStorageAccountQueueName
+    privateEndpointBlobName: resourceNames.outputs.pe.storageAccountBlobName
+    privateEndpointTableName: resourceNames.outputs.pe.storageAccountTableName
+    privateEndpointQueueName: resourceNames.outputs.pe.storageAccountQueueName
     myIpAddress: myIpAddress
     containers: ['data', 'batch-input', 'batch-output']
     allowSharedKeyAccess: false
@@ -448,7 +448,7 @@ module keyVault './modules/security/keyvault.bicep' = {
     publicNetworkAccess: publicAccessEnabled ? 'Enabled' : 'Disabled'
     keyVaultOwnerIpAddress: myIpAddress
     createUserAssignedIdentity: false
-    privateEndpointName: resourceNames.outputs.peKeyVaultName
+    privateEndpointName: resourceNames.outputs.pe.keyVaultName
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
   }
 }
@@ -533,7 +533,7 @@ module cosmos './modules/database/cosmosdb.bicep' = {
     location: location
     tags: tags
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
-    privateEndpointName: resourceNames.outputs.peCosmosDbName
+    privateEndpointName: resourceNames.outputs.pe.cosmosDbName
     managedIdentityPrincipalId: identity.outputs.managedIdentityPrincipalId
     userPrincipalId: principalId
     publicNetworkAccess: publicAccessEnabled ? 'enabled' : 'disabled'
@@ -555,7 +555,7 @@ module searchService './modules/search/search-services.bicep' = {
     // before 08/15: publicNetworkAccess: publicAccessEnabled ? 'enabled' : 'disabled'
     myIpAddress: myIpAddress
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
-    privateEndpointName: resourceNames.outputs.peSearchServiceName
+    privateEndpointName: resourceNames.outputs.pe.searchServiceName
     managedIdentityId: identity.outputs.managedIdentityId
     sku: {
       name: 'basic'
@@ -629,7 +629,7 @@ module aiFoundry './modules/ai/cognitive-services.bicep' = {
     // before 08/15: publicNetworkAccess: publicAccessEnabled ? 'enabled' : 'disabled'
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
     agentSubnetId: vnet.outputs.subnetAgentResourceID
-    privateEndpointName: resourceNames.outputs.peOpenAIName
+    privateEndpointName: resourceNames.outputs.pe.openAIName
     myIpAddress: myIpAddress
   }
   dependsOn: [
@@ -647,7 +647,7 @@ module documentIntelligence './modules/ai/document-intelligence.bicep' = if (dep
     publicNetworkAccess: makeWebAppsPublic ? 'enabled' : 'disabled'
     // before 08/15: publicNetworkAccess: publicAccessEnabled ? 'enabled' : 'disabled'
     privateEndpointSubnetId: vnet.outputs.subnetPeResourceID
-    privateEndpointName: resourceNames.outputs.peDocumentIntelligenceName
+    privateEndpointName: resourceNames.outputs.pe.documentIntelligenceName
     myIpAddress: myIpAddress
     managedIdentityId: identity.outputs.managedIdentityId
   }
@@ -756,9 +756,9 @@ module allDnsZones './modules/networking/all-zones.bicep' = if (createDnsZones) 
 module bastion './modules/networking/bastion.bicep' = {
   name: 'bastionDeployment'
   params: {
-    name: resourceNames.outputs.bastion_host_name
+    name: resourceNames.outputs.bastion.host_name
     location: location
-    publicIPName: resourceNames.outputs.bastion_pip_name
+    publicIPName: resourceNames.outputs.bastion.pip_name
     subnetId: vnet.outputs.subnetBastionResourceID // Make sure this output exists in your vnet module
     tags: tags
     enableTunneling: true
@@ -1037,7 +1037,7 @@ module managedEnvironment './modules/app/managedEnvironment.bicep' = if (deployC
     tags: tags
     publicAccessEnabled: makeWebAppsPublic // before 08/15: publicAccessEnabled
     containerAppEnvironmentWorkloadProfiles: containerAppEnvironmentWorkloadProfiles
-    privateEndpointName: makeWebAppsPublic ? '' : resourceNames.outputs.peContainerAppsName
+    privateEndpointName: makeWebAppsPublic ? '' : resourceNames.outputs.pe.containerAppsName
     privateEndpointSubnetId: makeWebAppsPublic ? '' : vnet.outputs.subnetPeResourceID
   }
 }

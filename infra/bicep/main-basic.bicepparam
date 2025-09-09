@@ -15,7 +15,7 @@
 using './main-basic.bicep'
 
 param applicationName = '#{APP_NAME}#'
-param environmentName = '#{envCode}#'
+param environmentName = '#{ENVIRONMENT_CODE}#'
 param principalId = '#{USER_PRINCIPAL_ID}#'
 param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
