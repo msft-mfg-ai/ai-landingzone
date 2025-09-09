@@ -22,7 +22,7 @@ on:
           - advanced
       appsToDeploy:
         description: Apps to Deploy
-        default: none
+        default: API+UI
         type: choice
         options:
           - none
