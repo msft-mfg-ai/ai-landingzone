@@ -4,9 +4,9 @@
 //   with optional parameters for existing resources.
 // --------------------------------------------------------------------------------------------------------------
 // You can test before deploy it with this command (run these commands in the same directory as this bicep file):
-//   az deployment group what-if --resource-group rg_mfg-ai-lz --template-file 'main-basic.bicep' --parameters environmentName=dev applicationName=otaiexp applicationId=otaiexp1 instanceNumber=002 regionCode=naa
+//   az deployment group what-if --resource-group rg_mfg-ai-lz --template-file 'main-basic.bicep' --parameters environmentName=dev applicationName=aiapp applicationId=aiapp1 instanceNumber=002 regionCode=US
 // You can deploy it with this command:
-//   az deployment group create -n manual --resource-group rg_mfg-ai-lz --template-file 'main-basic.bicep' --parameters environmentName=dev applicationName=otaiexp applicationId=otaiexp1 instanceNumber=002 regionCode=naa
+//   az deployment group create -n manual --resource-group rg_mfg-ai-lz --template-file 'main-basic.bicep' --parameters environmentName=dev applicationName=aiapp applicationId=aiapp1 instanceNumber=002 regionCode=US
 // Or with a parameter file:
 //   az deployment group create -n manual --resource-group rg_mfg-ai-lz --template-file 'main-basic.bicep' --parameters main-basic.your.bicepparam
 // --------------------------------------------------------------------------------------------------------------
@@ -150,8 +150,8 @@ param deployUIApp bool = false
 param deployDocumentIntelligence bool = false
 
 @description('Global Region where the resources will be deployed, e.g. AM (America), EM (EMEA), AP (APAC), CH (China)')
-//@allowed(['AM', 'EM', 'AP', 'CH', 'NAA'])
-param regionCode string = 'NAA'
+//@allowed(['AM', 'EM', 'AP', 'CH', 'US'])
+param regionCode string = 'US'
 
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 param instanceNumber string = '001' // used to differentiate multiple instances of the same application in the same environment

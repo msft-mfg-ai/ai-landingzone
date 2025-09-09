@@ -40,13 +40,12 @@ Follow these steps to get started quickly:
 
      Make sure the App_Name variable is unique to your deploy. It will be used as the basis for the application name and for all the other Azure resources, some of which must be globally unique.    Update `APP_NAME` with a value that is unique to your deployment, which can contain dashes or underscores (i.e. 'xxx-doc-review'). The `APP_NAME` will be used as the basis for all of the resource names, with the environment name (i.e. dev/qa/prod) appended to each resource name.
 
-    The Resource Group Name created will be `<RESOURCEGROUP_PREFIX>-<ENVIRONMENT>-<GLOBAL_REGION_CODE>-<INSTANCE>` and will be created in the `<RESOURCEGROUP_LOCATION>` Azure region. If you want to use an existing Resource Group Name or change the format of the `generatedResourceGroupName` variable in the [template-create-infra.yml](./workflows/template-create-infra.yml) file (and a few other YML files... search for `RESOURCEGROUP_PREFIX`).
+    The Resource Group Name created will be `<RESOURCEGROUP_PREFIX>-<ENVIRONMENT>` and will be created in the `<RESOURCEGROUP_LOCATION>` Azure region. If you want to use an existing Resource Group Name or change the format of the `generatedResourceGroupName` variable in the [template-create-infra.yml](./workflows/template-create-infra.yml) file (and a few other YML files... search for `RESOURCEGROUP_PREFIX`).
 
     The `<AIFOUNDRY_DEPLOY_LOCATION>` can be specified if you want to deploy the OpenAI resources in a different region than the rest of the resources due to region constraints.
 
     ```bash
     gh variable set APP_NAME -b YOUR-APP-NAME
-    gh variable set APP_ID -b YOUR-APP-ID
     gh variable set RESOURCEGROUP_PREFIX -b rg-PREFIX
     gh variable set RESOURCEGROUP_LOCATION -b eastus2
     gh variable set AIFOUNDRY_DEPLOY_LOCATION -b eastus2
