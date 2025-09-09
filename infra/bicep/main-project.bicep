@@ -138,7 +138,7 @@ module resourceNames 'resourcenames.bicep' = {
 // --------------------------------------------------------------------------------------------------------------
 var vm_name_internal = !empty(vm_name) ? vm_name : resourceNames.outputs.project_vm.vm_name
 var vnet_name_internal = !empty(existingVnetName) ? existingVnetName : resourceNames.outputs.root_vnet_Name
-var subnetPEName_internal = !empty(subnetPeName) ? subnetPeName : resourceNames.outputs.subnetPeName
+var subnetPEName_internal = !empty(subnetPeName) ? subnetPeName : resourceNames.outputs.subnet.peName
 
 module existingVirtualNetwork './modules/networking/vnet.bicep' = {
   name: 'vnet${deploymentSuffix}'
@@ -150,21 +150,21 @@ module existingVirtualNetwork './modules/networking/vnet.bicep' = {
     newVirtualNetworkName: resourceNames.outputs.vnet_Name
     vnetAddressPrefix: null
     vnetNsgName: resourceNames.outputs.vnetNsgName
-    subnetAppGwName: resourceNames.outputs.subnetAppGwName
+    subnetAppGwName: resourceNames.outputs.subnet.appGwName
     subnetAppGwPrefix: null
-    subnetAppSeName: resourceNames.outputs.subnetAppSeName
+    subnetAppSeName: resourceNames.outputs.subnet.appSeName
     subnetAppSePrefix: null
     subnetPeName: subnetPEName_internal
     subnetPePrefix: null
-    subnetAgentName: resourceNames.outputs.subnetAgentName
+    subnetAgentName: resourceNames.outputs.subnet.agentName
     subnetAgentPrefix: null
-    subnetBastionName: resourceNames.outputs.subnetBastionName
+    subnetBastionName: resourceNames.outputs.subnet.bastionName
     subnetBastionPrefix: null
     subnetJumpboxName: vm_name_internal
     subnetJumpboxPrefix: null
-    subnetTrainingName: resourceNames.outputs.subnetTrainingName
+    subnetTrainingName: resourceNames.outputs.subnet.trainingName
     subnetTrainingPrefix: null
-    subnetScoringName: resourceNames.outputs.subnetScoringName
+    subnetScoringName: resourceNames.outputs.subnet.scoringName
     subnetScoringPrefix: null
   }
 }
@@ -243,7 +243,7 @@ module cosmos './modules/database/cosmosdb.bicep' = {
     location: location
     tags: tags
     privateEndpointSubnetId: existingVirtualNetwork.outputs.subnetPeResourceID
-    privateEndpointName: resourceNames.outputs.peCosmosDbName
+    privateEndpointName: resourceNames.outputs.pe.cosmosDbName
     managedIdentityPrincipalId: identity.outputs.managedIdentityPrincipalId
     userPrincipalId: principalId
     publicNetworkAccess: publicAccessEnabled ? 'enabled' : 'disabled'
@@ -265,7 +265,7 @@ module searchService './modules/search/search-services.bicep' = {
     publicNetworkAccess: publicAccessEnabled ? 'enabled' : 'disabled'
     myIpAddress: myIpAddress
     privateEndpointSubnetId: existingVirtualNetwork.outputs.subnetPeResourceID
-    privateEndpointName: resourceNames.outputs.peSearchServiceName
+    privateEndpointName: resourceNames.outputs.pe.searchServiceName
     managedIdentityId: identity.outputs.managedIdentityId
     sku: {
       name: 'basic'
@@ -284,9 +284,9 @@ module storage './modules/storage/storage-account.bicep' = {
     location: location
     tags: tags
     privateEndpointSubnetId: existingVirtualNetwork.outputs.subnetPeResourceID
-    privateEndpointBlobName: resourceNames.outputs.peStorageAccountBlobName
-    privateEndpointTableName: resourceNames.outputs.peStorageAccountTableName
-    privateEndpointQueueName: resourceNames.outputs.peStorageAccountQueueName
+    privateEndpointBlobName: resourceNames.outputs.pe.storageAccountBlobName
+    privateEndpointTableName: resourceNames.outputs.pe.storageAccountTableName
+    privateEndpointQueueName: resourceNames.outputs.pe.storageAccountQueueName
     myIpAddress: myIpAddress
     containers: ['data', 'batch-input', 'batch-output']
     allowSharedKeyAccess: false
