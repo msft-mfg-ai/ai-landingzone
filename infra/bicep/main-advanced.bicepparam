@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------------
 // The following values should be defined in GitHub Secrets or Environment Variables:
 //   APP_NAME            - GH Repository Variable - no need to override
-//   APP_ID              - GH Repository Variable - no need to override
 //   USER_PRINCIPAL_ID   - GH Environment Secret - User Principal ID - this is you - BYO User
 //   INSTANCE_NUMBER     - GH Environment Variable
 //   OWNER_EMAIL         - GH Environment Variable - optional

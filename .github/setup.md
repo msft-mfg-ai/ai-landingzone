@@ -46,7 +46,6 @@ Follow these steps to get started quickly:
 
     ```bash
     gh variable set APP_NAME -b YOUR-APP-NAME
-    gh variable set APP_ID -b YOUR-APP-ID
     gh variable set RESOURCEGROUP_PREFIX -b rg-PREFIX
     gh variable set RESOURCEGROUP_LOCATION -b eastus2
     gh variable set AIFOUNDRY_DEPLOY_LOCATION -b eastus2
