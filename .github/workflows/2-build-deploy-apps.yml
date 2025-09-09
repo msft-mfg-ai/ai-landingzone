@@ -91,26 +91,16 @@ jobs:
 
       RESOURCE_GROUP_NAME: ${{ steps.set-env.outputs.RESOURCE_GROUP_NAME }}
 
-      # BICEP DEFINITION: output acrName string = toLower('${resourceAbbreviations.appContainerRegistry}-${sanitizedAppName}-${sanitizedEnvironment}${resourceToken}${dashRegionDashInstance}')
-      # EXAMPLE: crooaidevnaa020
       ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.GLOBAL_REGION_CODE }}${{ vars.INSTANCE_NUMBER }}'
-      # ACR_NAME: '${{ steps.set-env.outputs.ACR_NAME }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
 
-      # BICEP DEFINITION: output caManagedEnvName string = toLower('${resourceAbbreviations.appManagedEnvironments}-${sanitizedAppName}-${sanitizedEnvironment}${resourceToken}${dashRegionDashInstance}')
-      # EXAMPLE: cae-ooai-dev-naa-020
-      # CONTAINER_APP_ENV_NAME: 'cae-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
       CONTAINER_APP_ENV_NAME: '${{ steps.set-env.outputs.CONTAINER_APP_ENV_NAME }}'
 
-      # BICEP DEFINITION: output containerAppAPIName string = take(toLower('${resourceAbbreviations.appContainerApps}-api-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
-      # EXAMPLE: ca-api-ooai-dev-naa-020
       API_CONTAINER_APP_NAME: 'ca-api-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
       API_APP_PATH: ${{ env.API_APP_PATH }}
       API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}
       API_PORT: ${{ env.API_PORT }}
 
-      # BICEP DEFINITION: output containerAppUIName string = take(toLower('${resourceAbbreviations.appContainerApps}-ui-${sanitizedAppName}-${sanitizedEnvironment}${resourceTokenWithDash}${dashRegionDashInstance}'), 32)
-      # EXAMPLE: ca-ui-ooai-dev-naa-020
       UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
       UI_APP_PATH: ${{ env.UI_APP_PATH }}
       UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
