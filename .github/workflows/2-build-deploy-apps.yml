@@ -89,7 +89,7 @@ jobs:
       APP_NAME: ${{ vars.APP_NAME }}
       APP_NAME_NO_DASHES: ${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}
 
-      RESOURCE_GROUP_NAME: ${{ steps.set-env.outputs.RESOURCE_GROUP_NAME }}
+      RESOURCEGROUPNAME: ${{ steps.set-env.outputs.RESOURCEGROUPNAME }}
 
       ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.GLOBAL_REGION_CODE }}${{ vars.INSTANCE_NUMBER }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
@@ -126,9 +126,9 @@ jobs:
           echo "ENV_INITIAL=$ENV_INITIAL"
           echo "ENV_INITIAL=$ENV_INITIAL" >> $GITHUB_OUTPUT
 
-          RESOURCE_GROUP_NAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.deployEnvironment }}" | tr '[:upper:]' '[:lower:]')"
-          echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME"
-          echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
+          RESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}" | tr '[:upper:]' '[:lower:]')"
+          echo "RESOURCEGROUPNAME=$RESOURCEGROUPNAME"
+          echo "RESOURCEGROUPNAME=$RESOURCEGROUPNAME" >> $GITHUB_OUTPUT
 
           ACR_NAME="$(echo ${{ vars.ACR_NAME }} | tr '[:upper:]' '[:lower:]')"
           echo "ACR_NAME=$ACR_NAME" >> $GITHUB_OUTPUT
@@ -137,7 +137,7 @@ jobs:
           echo "CONTAINER_APP_ENV_NAME=$CONTAINER_APP_ENV_NAME" >> $GITHUB_OUTPUT
 
           echo "APP_NAME_NO_DASHES: $APP_NAME_NO_DASHES"
-          echo "RESOURCE_GROUP_NAME: $RESOURCE_GROUP_NAME"
+          echo "RESOURCEGROUPNAME: $RESOURCEGROUPNAME"
           echo "ENV_DASH_REGION_DASH_INSTANCE: $ENV_DASH_REGION_DASH_INSTANCE"
           echo "ACR_NAME: $ACR_NAME"
           echo "CONTAINER_APP_ENV_NAME: $CONTAINER_APP_ENV_NAME"
@@ -170,7 +170,7 @@ jobs:
     secrets: inherit
     with:
       ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
-      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCE_GROUP_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
 
       ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
       ACR_REPO_NAME: ${{ needs.template-env.outputs.ACR_REPO_NAME }}
@@ -189,7 +189,7 @@ jobs:
     secrets: inherit
     with:
       ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
-      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCE_GROUP_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
 
       ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
       ACR_REPO_NAME: ${{ needs.template-env.outputs.ACR_REPO_NAME }}
@@ -210,7 +210,7 @@ jobs:
     with:
       ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
       ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
-      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCE_GROUP_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
       CONTAINER_APP_ENV_NAME: ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }}
       CONTAINER_NAME: ${{ needs.template-env.outputs.API_CONTAINER_APP_NAME }}
       PORT: ${{ needs.template-env.outputs.API_PORT }}
@@ -228,7 +228,7 @@ jobs:
     with:
       ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
       ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
-      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCE_GROUP_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
       CONTAINER_APP_ENV_NAME: ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }}
       CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
       PORT: ${{ needs.template-env.outputs.UI_PORT }}
@@ -259,7 +259,7 @@ jobs:
           echo "Creating API Container App..."
           az containerapp create \
             --name ${{ needs.template-env.outputs.API_CONTAINER_APP_NAME }} \
-            --resource-group ${{ needs.template-env.outputs.RESOURCE_GROUP_NAME }} \
+            --resource-group ${{ needs.template-env.outputs.RESOURCEGROUPNAME }} \
             --environment ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }} \
             --image ${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io/${{ needs.build-api.outputs.IMAGE_NAME }} \
             --target-port ${{ needs.template-env.outputs.API_PORT }} \
@@ -314,7 +314,7 @@ jobs:
           echo "Creating UI Container App..."
           az containerapp create \
             --name ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }} \
-            --resource-group ${{ needs.template-env.outputs.RESOURCE_GROUP_NAME }} \
+            --resource-group ${{ needs.template-env.outputs.RESOURCEGROUPNAME }} \
             --environment ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }} \
             --image ${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io/${{ needs.build-ui.outputs.IMAGE_NAME }} \
             --target-port ${{ needs.template-env.outputs.UI_PORT }} \

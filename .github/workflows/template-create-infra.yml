@@ -151,14 +151,14 @@ jobs:
           echo "ENV_INITIAL=$ENV_INITIAL" >> $GITHUB_OUTPUT
 
           if [ -z "${{ inputs.projectName }}" ]; then
-          RESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.envCode }}" | tr '[:upper:]' '[:lower:]')"
+          RESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.envCode }}-${{ vars.INSTANCE_NUMBER }}" | tr '[:upper:]' '[:lower:]')"
           else
-          RESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.envCode }}-${{ inputs.projectName }}" | tr '[:upper:]' '[:lower:]')"
+          RESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.envCode }}--${{ vars.INSTANCE_NUMBER }}${{ inputs.projectName }}" | tr '[:upper:]' '[:lower:]')"
           fi
           echo "RESOURCEGROUPNAME=$RESOURCEGROUPNAME"
           echo "RESOURCEGROUPNAME=$RESOURCEGROUPNAME" >> $GITHUB_OUTPUT
 
-          ROOTRESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.envCode }}" | tr '[:upper:]' '[:lower:]')"
+          ROOTRESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.envCode }}-${{ vars.INSTANCE_NUMBER }}" | tr '[:upper:]' '[:lower:]')"
           echo "ROOTRESOURCEGROUPNAME=$ROOTRESOURCEGROUPNAME"
           echo "ROOTRESOURCEGROUPNAME=$ROOTRESOURCEGROUPNAME" >> $GITHUB_OUTPUT
 
