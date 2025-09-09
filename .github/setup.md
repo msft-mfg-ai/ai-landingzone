@@ -51,21 +51,22 @@ Follow these steps to get started quickly:
     gh variable set RESOURCEGROUP_LOCATION -b eastus2
     gh variable set AIFOUNDRY_DEPLOY_LOCATION -b eastus2
     gh variable set OPENAI_DEPLOY_LOCATION -b eastus2
-    gh variable set INSTANCE_NUMBER -b 01
-    gh variable set GLOBAL_REGION_CODE -b AM
+    gh variable set INSTANCE_NUMBER -b 001
+    gh variable set GLOBAL_REGION_CODE -b US
+    gh variable set DEPLOYMENTCOUNT -b 001
+    gh variable set ENVCODE -b Dev
+    gh variable set INSTANCE_NUMBER -b 001
     ```
 
     For resource tags, set these variables:
 
     ```bash
-    gh variable set APPLICATION_OWNER -b first.last_yourdomain.com
-    gh variable set BUSINESS_OWNER -b first.last_yourdomain.com
-    gh variable set COST_CENTER -b YOUR-VALUE
-    gh variable set CREATED_BY -b first.last_yourdomain.com
-    gh variable set LTI_SERVICE_CLASS -b YOUR-VALUE
-    gh variable set PRIMARY_SUPPORT_PROVIDER -b YOUR-VALUE
-    gh variable set REQUESTOR_NAME -b first.last_yourdomain.com
-    gh variable set REQUEST_NUMBER -b YOUR-VALUE
+    gh variable set APPLICATION_OWNER -b SomeAppOwner
+    gh variable set BUSINESS_OWNER -b SomeBusOwner
+    gh variable set COST_CENTER -b 9999999
+    gh variable set CREATED_BY -b SomeCreator
+    gh variable set OWNER_EMAIL -b applicationowner@company.com
+    gh variable set REQUESTOR_NAME -b SomeRequestor
     ```
 
     For each environment, you can control the AI Model capacity with this variable:
