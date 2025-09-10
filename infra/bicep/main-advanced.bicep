@@ -59,23 +59,23 @@ param existingVnetName string = ''
 @description('If you provide an existing VNET what resource group is it in?')
 param existingVnetResourceGroupName string = ''
 @description('If you provide this is will be used instead of creating a new VNET')
-param vnetPrefix string = '10.183.4.0/22'
+param vnetPrefix string = '172.16.4.0/22'
 param subnetAppGwName string = ''
-param subnetAppGwPrefix string = cidrSubnet(vnetPrefix, 24, 1) // '10.183.5.0/24'
+param subnetAppGwPrefix string = cidrSubnet(vnetPrefix, 24, 1) // '172.16.5.0/24'
 param subnetAppSeName string = ''
-param subnetAppSePrefix string = cidrSubnet(vnetPrefix, 24, 0) // 10.183.4.0/24
+param subnetAppSePrefix string = cidrSubnet(vnetPrefix, 24, 0) // '172.16.4.0/24'
 param subnetPeName string = ''
-param subnetPePrefix string = cidrSubnet(vnetPrefix, 27, 16) // 10.183.6.0/27
+param subnetPePrefix string = cidrSubnet(vnetPrefix, 27, 16) // '172.16.6.0/27'
 param subnetAgentName string = ''
-param subnetAgentPrefix string = cidrSubnet(vnetPrefix, 27, 17) // 10.183.6.32/27
+param subnetAgentPrefix string = cidrSubnet(vnetPrefix, 27, 17) // '172.16.6.32/27'
 param subnetBastionName string = '' // This is the default for the MFG AI LZ, it can be changed to fit your needs
-param subnetBastionPrefix string = cidrSubnet(vnetPrefix, 26, 9) // 10.183.6.64/26
+param subnetBastionPrefix string = cidrSubnet(vnetPrefix, 26, 9) // '172.16.6.64/26'
 param subnetJumpboxName string = '' // This is the default for the MFG AI LZ, it can be changed to fit your needs
-param subnetJumpboxPrefix string = cidrSubnet(vnetPrefix, 28, 40) // 10.183.6.128/28
+param subnetJumpboxPrefix string = cidrSubnet(vnetPrefix, 28, 40) // '172.16.6.128/28'
 param subnetTrainingName string = ''
-param subnetTrainingPrefix string = cidrSubnet(vnetPrefix, 25, 6) // 10.183.7.0/25
+param subnetTrainingPrefix string = cidrSubnet(vnetPrefix, 25, 6) // '172.16.7.0/25'
 param subnetScoringName string = ''
-param subnetScoringPrefix string = cidrSubnet(vnetPrefix, 25, 7) // 10.183.7.128/25
+param subnetScoringPrefix string = cidrSubnet(vnetPrefix, 25, 7) // '172.16.7.128/25'
 
 // --------------------------------------------------------------------------------------------------------------
 // Virtual machine jumpbox
