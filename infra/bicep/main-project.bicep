@@ -80,7 +80,6 @@ param runDateTime string = utcNow()
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
 param businessOwnerTag string = 'UNKNOWN'
-param requestorNameTag string = 'UNKNOWN'
 param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
 param costCenterTag string = 'UNKNOWN'
@@ -96,7 +95,6 @@ var tags = {
   'creation-date': take(runDateTime, 8)
   'created-by': createdByTag
   'environment-name': environmentName
-  'requestor-name': requestorNameTag
   'application-owner': applicationOwnerTag
   'business-owner': businessOwnerTag
   'cost-center': costCenterTag

@@ -9,4 +9,6 @@ public class ChatApiOptions
 
     [Required]
     public string AIAgentId { get; init; } = default!;
+
+    public string? VisualStudioTenantId { get; init; }
 }

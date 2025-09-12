@@ -49,7 +49,7 @@ jobs:
       envCode: ${{ inputs.deployEnvironment }}
       templatePath: './infra/bicep/'
       templateFile: 'main-project.bicep'
-      parameterFile: 'main-project.bicepparam'
+      parameterFile: 'main-project-gh.bicepparam'
       parameterFileReplaceTokens: 'true'
       requestorName: ${{ github.actor }}
       createResourceGroup: ${{ inputs.createProjectResourceGroup }}

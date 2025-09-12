@@ -13,7 +13,17 @@ builder.Services.AddOptions<ChatApiOptions>()
 builder.Services.AddSingleton((provider) =>
 {
     var config = provider.GetRequiredService<IOptions<ChatApiOptions>>().Value;
-    PersistentAgentsClient client = new(config.AIProjectEndpoint, new DefaultAzureCredential());
+    // if doing local development and you get error "Token tenant does not match resource tenant", force the tenant
+    var vsTenantId = config.VisualStudioTenantId;
+    var credential = string.IsNullOrEmpty(vsTenantId) ?
+        new DefaultAzureCredential() :
+        new DefaultAzureCredential(new DefaultAzureCredentialOptions
+        {
+            ExcludeEnvironmentCredential = true,
+            ExcludeManagedIdentityCredential = true,
+            TenantId = vsTenantId
+        });
+    PersistentAgentsClient client = new(config.AIProjectEndpoint, credential);
 
     return client;
 });
