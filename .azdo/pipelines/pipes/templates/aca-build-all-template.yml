@@ -27,10 +27,10 @@ parameters:
     default: ''
     type: string
 
-  - name: batchAcrAppName
+  - name: uiAcrAppName
     default: ''
     type: string
-  - name: batchProjectFolderName
+  - name: uiAcrAppName
     default: ''
     type: string
 
@@ -69,7 +69,7 @@ jobs:
             echo "##vso[task.setvariable variable=appNameLower]$appNameLower"
             $appNameNoDashesLower="$(APP_NAME)".ToLower().Replace("-", "")
 
-            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower".ToLower()
+            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)".ToLower()
             echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
             
             echo "##vso[task.setvariable variable=appNameNoDashesLower]$appNameNoDashesLower"
@@ -89,12 +89,12 @@ jobs:
             $apiImageNameBranch="$($acrFolderNameLower)/$($apiAcrAppNameLower):$(Build.SourceBranchName)"
             echo "##vso[task.setvariable variable=apiImageNameBranch]$apiImageNameBranch"
 
-            $batchAcrAppNameLower="${{ parameters.batchAcrAppName }}".ToLower()
-            echo "##vso[task.setvariable variable=batchAcrAppNameLower]$batchAcrAppNameLower"
-            $batchImageName="$($acrFolderNameLower)/$($batchAcrAppNameLower):$(Build.BuildId)"
-            echo "##vso[task.setvariable variable=batchImageName]$batchImageName"
-            $batchImageNameBranch="$($acrFolderNameLower)/$($batchAcrAppNameLower):$(Build.SourceBranchName)"
-            echo "##vso[task.setvariable variable=batchImageNameBranch]$batchImageNameBranch"
+            $uiAcrAppNameLower="${{ parameters.uiAcrAppName }}".ToLower()
+            echo "##vso[task.setvariable variable=uiAcrAppNameLower]$uiAcrAppNameLower"
+            $uiImageName="$($acrFolderNameLower)/$($uiAcrAppNameLower):$(Build.BuildId)"
+            echo "##vso[task.setvariable variable=uiImageName]$uiImageName"
+            $uiImageNameBranch="$($acrFolderNameLower)/$($uiAcrAppNameLower):$(Build.SourceBranchName)"
+            echo "##vso[task.setvariable variable=uiImageNameBranch]$uiImageNameBranch"
 
             echo "appNameLower=$appNameLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"
@@ -110,10 +110,10 @@ jobs:
             echo "apiImageName=$apiImageName"
             echo "apiImageNameBranch=$apiImageNameBranch"
 
-            echo "parameters.batchAcrAppName=${{ parameters.batchAcrAppName }}"
-            echo "batchAcrAppNameLower=$batchAcrAppNameLower"
-            echo "batchImageName=$batchImageName"
-            echo "batchImageNameBranch=$batchImageNameBranch"
+            echo "parameters.uiAcrAppName=${{ parameters.uiAcrAppName }}"
+            echo "uiAcrAppNameLower=$uiAcrAppNameLower"
+            echo "uiImageName=$uiImageName"
+            echo "uiImageNameBranch=$uiImageNameBranch"
 
             echo "----------------------------------------"
             echo "##[group]Display All Environment Variables:"
@@ -139,14 +139,14 @@ jobs:
           workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.apiProjectFolderName }}'
 
       - task: PowerShell@2
-        displayName: Docker Batch Build
+        displayName: Docker UI Build
         inputs:
           targetType: 'inline'
           script: |
-            echo "Executing: docker build . $(batchImageName)"
-            docker build . -t $(batchImageName) -t $(batchImageNameBranch)
+            echo "Executing: docker build . $(uiImageName)"
+            docker build . -t $(uiImageName) -t $(uiImageNameBranch)
             docker images
-          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.batchProjectFolderName }}'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.uiAcrAppName }}'
 
       # ----------------------------------------------------------------------------------------------------
       # ACR Push: Push to ACR, add/remove firewall rules and remove if requested
@@ -175,8 +175,8 @@ jobs:
         - template: steps-container-registry-template.yml
           parameters:
             action: 'push'
-            imageName: $(batchImageName)
-            imageNameLatest: $(batchImageNameBranch)
+            imageName: $(uiImageName)
+            imageNameLatest: $(uiImageNameBranch)
             serviceConnectionName: ${{ parameters.serviceConnectionName }}
             registryName: $(containerRegistryName)
             registryResourceGroup: $(resourceGroupName)

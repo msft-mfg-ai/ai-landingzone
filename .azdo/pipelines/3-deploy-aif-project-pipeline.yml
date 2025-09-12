@@ -75,21 +75,23 @@ stages:
       - template: pipes/infra-only-pipe.yml
         parameters:
           environments: ['${{ parameters.deployToEnvironment }}']
-          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
-          runGHASScan: ${{ parameters.runGHASScan }}
+          bicepVersion: 'project'
           singleEnvironment: 'true'
           createResourceGroup: ${{ parameters.createResourceGroup }}
           publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
-          createDnsZones: ${{ parameters.createDnsZones }}
+          appsToDeploy: 'none'
           addRoleAssignments: ${{ parameters.addRoleAssignments }}
+          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+          runGHASScan: false
 
   - ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
       - template: pipes/infra-only-pipe.yml
         parameters:
           environments: ['DEV', 'QA', 'PROD']
-          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
-          runGHASScan: ${{ parameters.runGHASScan }}
+          bicepVersion: 'project'
           createResourceGroup: ${{ parameters.createResourceGroup }}
           publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
-          createDnsZones: ${{ parameters.createDnsZones }}
+          appsToDeploy: 'none'
           addRoleAssignments: ${{ parameters.addRoleAssignments }}
+          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+          runGHASScan: false

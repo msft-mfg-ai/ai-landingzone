@@ -17,10 +17,10 @@ parameters:
     type: object
     default: {}
 
-  - name: deployBatch
+  - name: deployUI
     default: false
     type: boolean
-  - name: batchConfig
+  - name: uiConfig
     type: object
     default: {}
 
@@ -38,5 +38,5 @@ stages:
         apiAcrAppName: ${{ parameters.apiConfig.acrAppName }}
         apiProjectFolderName: ${{ parameters.apiConfig.projectFolderName }}
 
-        batchAcrAppName: ${{ parameters.batchConfig.acrAppName }}
-        batchProjectFolderName: ${{ parameters.batchConfig.projectFolderName }}
+        uiAcrAppName: ${{ parameters.uiConfig.acrAppName }}
+        uiProjectFolderName: ${{ parameters.uiConfig.projectFolderName }}

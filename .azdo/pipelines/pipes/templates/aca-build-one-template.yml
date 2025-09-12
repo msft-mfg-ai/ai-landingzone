@@ -28,20 +28,20 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
-  - deployment: Build${{ parameters.acrAppName }}${{ parameters.environmentcode }}App
-    displayName: Init Build ${{ parameters.acrAppName }} ${{ parameters.environmentcode }}
-    environment: ${{ parameters.environmentcode }}
+  - deployment: Build${{ parameters.acrAppName }}${{ parameters.environmentCode }}App
+    displayName: Init Build ${{ parameters.acrAppName }} ${{ parameters.environmentCode }}
+    environment: ${{ parameters.environmentCode }}
 
-  - job: Build${{ parameters.acrAppName }}${{ parameters.environmentcode }}Job
-    displayName: Build ${{ parameters.acrAppName }} ${{ parameters.environmentcode }}
+  - job: Build${{ parameters.acrAppName }}${{ parameters.environmentCode }}Job
+    displayName: Build ${{ parameters.acrAppName }} ${{ parameters.environmentCode }}
     variables:
       - group: AI.LZ.Secrets # need to get the appName from here
       # Bring in environment specific variable files
-      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
+      - ${{ if eq(lower(parameters.environmentCode), 'dev') }}:
           - template: ../../vars/var-dev.yml
-      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
+      - ${{ if eq(lower(parameters.environmentCode), 'qa') }}:
           - template: ../../vars/var-qa.yml
-      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
+      - ${{ if eq(lower(parameters.environmentCode), 'prod') }}:
           - template: ../../vars/var-prod.yml
 
     steps:
@@ -55,14 +55,14 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            $environmentCodeLower="${{ parameters.environmentcode }}".ToLower()
+            $environmentCodeLower="${{ parameters.environmentCode }}".ToLower()
             echo "##vso[task.setvariable variable=environmentCodeLower]$environmentCodeLower"
             $appNameLower="$(APP_NAME)".ToLower()
             echo "##vso[task.setvariable variable=appNameLower]$appNameLower"
             $appNameNoDashesLower="$(APP_NAME)".ToLower().Replace("-", "")
             echo "##vso[task.setvariable variable=appNameNoDashesLower]$appNameNoDashesLower"
 
-            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower".ToLower()
+            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)".ToLower()
             echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
             
             $acrAppNameLower="${{ parameters.acrAppName }}".ToLower()
@@ -73,10 +73,12 @@ jobs:
             echo "##vso[task.setvariable variable=imageName]$imageName"
             $imageNameBranch="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.SourceBranchName)"
             echo "##vso[task.setvariable variable=imageNameBranch]$imageNameBranch"
-            $containerRegistryName="$($appNameNoDashesLower)cr$($environmentCodeLower)"
+
+            $containerRegistryName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
             echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
-            $containerRegistryUrl="$($appNameNoDashesLower)cr$($environmentCodeLower).azurecr.io"
+            $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
+
             $agentIpAddress = $(Invoke-WebRequest -Uri "https://api.ipify.org").Content
             echo "##vso[task.setvariable variable=agentIpAddress]$agentIpAddress"
 

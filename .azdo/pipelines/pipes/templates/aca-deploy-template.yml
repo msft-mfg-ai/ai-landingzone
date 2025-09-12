@@ -58,15 +58,16 @@ jobs:
             $acrFolderNameLower="${{ parameters.acrFolderName }}".ToLower()
             $acrAppNameLower="${{ parameters.acrAppName }}".ToLower()
 
-            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower".ToLower()
+            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)".ToLower()
             echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
             
             $caAppName="$($appNameNoDashesLower)-ca-$($containerAppNameLower)-$($environmentCodeLower)"
             echo "##vso[task.setvariable variable=caAppName]$caAppName"
-            $containerRegistryUrl="$($appNameNoDashesLower)cr$($environmentCodeLower).azurecr.io"
-            echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
             $imageName="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.BuildId)"
             echo "##vso[task.setvariable variable=imageName]$imageName"
+
+            $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
+            echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
 
             echo "environmentCodeLower=$environmentCodeLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"

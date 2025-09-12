@@ -17,28 +17,28 @@ variables:
   - name: workingDirectoryIgnore
     value: '/docs'
 
-  # Not used at this time...  just here to prevent replacement warnings
-  - name: APIM_BASE_URL
-    value: ''
-  - name: APIM_ACCESS_URL
-    value: ''
-  - name: APIM_ACCESS_KEY
-    value: ''
-  - name: ENTRA_TENANT_ID
-    value: ''
-  - name: ENTRA_API_AUDIENCE
-    value: ''
-  - name: ENTRA_SCOPES
-    value: ''
-  - name: ENTRA_REDIRECT_URI
-    value: ''
-  - name: ENTRA_CLIENT_ID
-    value: ''
-  - name: ENTRA_CLIENT_SECRET
-    value: ''
-  - name: deployAPIM
-    value: 'false'
-  - name: UI_IMAGE_NAME
-    value: ''
-  - name: MOCK_USER_UPN
-    value: ''
+  # # Not used at this time...
+  # - name: APIM_BASE_URL
+  #   value: ''
+  # - name: APIM_ACCESS_URL
+  #   value: ''
+  # - name: APIM_ACCESS_KEY
+  #   value: ''
+  # - name: ENTRA_TENANT_ID
+  #   value: ''
+  # - name: ENTRA_API_AUDIENCE
+  #   value: ''
+  # - name: ENTRA_SCOPES
+  #   value: ''
+  # - name: ENTRA_REDIRECT_URI
+  #   value: ''
+  # - name: ENTRA_CLIENT_ID
+  #   value: ''
+  # - name: ENTRA_CLIENT_SECRET
+  #   value: ''
+  # - name: deployAPIM
+  #   value: 'false'
+  # - name: UI_IMAGE_NAME
+  #   value: ''
+  # - name: MOCK_USER_UPN
+  #   value: ''

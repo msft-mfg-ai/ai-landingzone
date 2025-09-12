@@ -336,8 +336,8 @@ module apiKeySecret './modules/security/keyvault-secret.bicep' = {
   }
 }
 
-module apimSecret './modules/security/keyvault-secret.bicep' = {
-  name: 'apim-search${deploymentSuffix}'
+module apimSecret './modules/security/keyvault-secret.bicep' = if (deployAPIM) {
+  name: 'secret-apim${deploymentSuffix}'
   params: {
     keyVaultName: keyVault.outputs.name
     secretName: 'apimkey'
@@ -348,7 +348,7 @@ module apimSecret './modules/security/keyvault-secret.bicep' = {
 }
 
 module entraClientIdSecret './modules/security/keyvault-secret.bicep' = if (deployEntraClientSecrets) {
-  name: 'entraClientId-search${deploymentSuffix}'
+  name: 'secret-entraClientId${deploymentSuffix}'
   params: {
     keyVaultName: keyVault.outputs.name
     secretName: 'entraclientid'
@@ -357,7 +357,7 @@ module entraClientIdSecret './modules/security/keyvault-secret.bicep' = if (depl
   }
 }
 module entraClientSecretSecret './modules/security/keyvault-secret.bicep' = if (deployEntraClientSecrets) {
-  name: 'entraClientSecret-search${deploymentSuffix}'
+  name: 'secret-entraClientSecret${deploymentSuffix}'
   params: {
     keyVaultName: keyVault.outputs.name
     secretName: 'entraclientsecret'
@@ -613,13 +613,13 @@ var apiSettings = [
   { name: 'AZURE_SDK_TRACING_IMPLEMENTATION', value: 'opentelemetry' }
   { name: 'AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED', value: 'true' }
 
-  { name: 'APIM_BASE_URL', value: apimBaseUrl }
-  { name: 'APIM_ACCESS_URL', value: apimAccessUrl }
-  { name: 'APIM_KEY', secretRef: 'apimkey' }
   { name: 'MOCK_USER_UPN', value: string(mockUserUpn) }
 ]
 var apimSettings = deployAPIM
   ? [
+  { name: 'APIM_BASE_URL', value: apimBaseUrl }
+  { name: 'APIM_ACCESS_URL', value: apimAccessUrl }
+  { name: 'APIM_KEY', secretRef: 'apimkey' }
   { name: 'API_MANAGEMENT_NAME', value: apim!.outputs.name }
   { name: 'API_MANAGEMENT_ID', value: apim!.outputs.id }
   { name: 'API_MANAGEMENT_ENDPOINT', value: apim!.outputs.gatewayUrl }
