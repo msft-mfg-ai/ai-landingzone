@@ -16,7 +16,7 @@ stages:
     jobs:
       - template: templates/scan-code-template.yml
         parameters:
-          environmentName: 'DEV'
+          environmentCode: 'DEV'
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
           runGHASScan: ${{ parameters.runGHASScan }}
           codeSection: ${{ parameters.codeSection }}

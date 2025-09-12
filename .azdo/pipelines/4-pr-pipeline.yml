@@ -15,7 +15,7 @@ pr:
 
 # ----------------------------------------------------------------------------------------------------
 variables:
-  - group: AI.LZ.Keys
+  - group: AI.LZ.Secrets
   - template: vars/var-service-connections.yml
 
 # ----------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ stages:
     jobs:
       - template: pipes/templates/scan-code-template.yml
         parameters:
-          environmentName: 'DEV'
+          environmentCode: 'DEV'
           runMSDevSecOpsScan: true
           runGHASScan: false
 

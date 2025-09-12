@@ -22,13 +22,11 @@ on:
           - advanced
       appsToDeploy:
         description: Apps to Deploy
-        default: API+UI
+        default: UI
         type: choice
         options:
           - none
-          - API
           - UI
-          - API+UI
       bicepDeploymentMode:
         description: Bicep Mode
         default: create
@@ -48,15 +46,16 @@ on:
         description: Make Web Apps Public?
         type: boolean
         default: true
-      deployAPIM:
-        description: Deploy APIM?
-        type: boolean
-        default: false
       runMSSecurityScan:
         description: Run MS DevSecOps Security Scan
         required: false
         default: true
         type: boolean
+
+      # deployAPIM:
+      #   description: Deploy APIM?
+      #   type: boolean
+      #   default: false
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
@@ -98,7 +97,7 @@ jobs:
       requestorName: ${{ github.actor }}
       createResourceGroup: ${{ inputs.createResourceGroup }}
       addRoleAssignments: ${{ inputs.addRoleAssignments }}
-      deployAPIM: ${{ inputs.deployAPIM }}
       appsToDeploy: ${{ inputs.appsToDeploy }}
       bicepDeploymentMode: ${{ inputs.bicepDeploymentMode }}
       makeWebAppsPublic: ${{ inputs.makeWebAppsPublic }}
+      #deployAPIM: ${{ inputs.deployAPIM }}

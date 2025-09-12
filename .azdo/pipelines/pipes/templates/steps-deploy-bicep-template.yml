@@ -20,15 +20,22 @@ steps:
   - ${{ if parameters.deployToResourceGroup }}:
     - ${{ if parameters.createResourceGroup }}:
       - task: AzureCLI@2
-        displayName: 'Create $(environmentName) Resource Group'
+        displayName: 'Create $(environmentCode) Resource Group'
         inputs:
           azureSubscription: ${{ parameters.serviceConnectionName }}
           scriptType: bash
           scriptLocation: inlineScript
-          inlineScript: az group create --name ${{ parameters.resourceGroupName }} --location $(location) --tags LastDeployed=$(runDateTime) Application=$(appName) Environment=$(environmentName)
+          inlineScript: |
+            echo "resourceGroupName=${{ parameters.resourceGroupName }}"
+            echo "location $(RESOURCEGROUP_LOCATION)"
+            echo "LastDeployed=$(runDateTime)"
+            echo "Application=$(APP_NAME)"
+            echo "Environment=$(environmentCode)"
+            echo "EXECUTE: az group create --name ${{ parameters.resourceGroupName }} --location $(RESOURCEGROUP_LOCATION) --tags LastDeployed=$(runDateTime) Application=$(APP_NAME) Environment=$(environmentCode)"
+            az group create --name ${{ parameters.resourceGroupName }} --location $(RESOURCEGROUP_LOCATION) --tags LastDeployed=$(runDateTime) Application=$(APP_NAME) Environment=$(environmentCode)
 
     - task: AzureResourceManagerTemplateDeployment@3
-      displayName: 'Publish $(environmentName) Bicep Resources (RG)'
+      displayName: 'Publish $(environmentCode) Bicep Resources (RG)'
       name: deployBicepRG
       inputs:
         csmFile: $(templateFile)
@@ -37,14 +44,14 @@ steps:
         resourceGroupName: ${{ parameters.resourceGroupName }}
         azureResourceManagerConnection: ${{ parameters.serviceConnectionName }}
         action: 'Create Or Update Resource Group'
-        location: $(location)
+        location: $(RESOURCEGROUP_LOCATION)
         templateLocation: 'Linked artifact'
         deploymentMode: ${{ parameters.deploymentMode }}
         deploymentOutputs: bicepOutputs
 
   - ${{ if ne(parameters.deployToResourceGroup, true) }}:
       - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Publish $(environmentName) Bicep Resources (Sub)'
+        displayName: 'Publish $(environmentCode) Bicep Resources (Sub)'
         name: deployBicepSub
         inputs:
           csmFile: $(templateFile)
@@ -52,7 +59,7 @@ steps:
           deploymentScope: 'Subscription'
           azureResourceManagerConnection: ${{ parameters.serviceConnectionName }}
           action: 'Create Or Update Resource Group'
-          location: $(location)
+          location: $(RESOURCEGROUP_LOCATION)
           templateLocation: 'Linked artifact'
           deploymentMode: ${{ parameters.deploymentMode }}
           deploymentOutputs: bicepOutputs

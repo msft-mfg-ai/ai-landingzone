@@ -27,7 +27,7 @@ These Azure DevOps YML files were designed to run as multi-stage environment dep
 
 ---
 
-## Create the variable group "AI.LZ.Keys"
+## Create the variable group "AI.LZ.Secrets"
 
 This project needs a variable group with at least one variable in it that uniquely identifies your resources.
 
@@ -38,15 +38,20 @@ To create this variable groups, customize and run this command in the Azure Clou
 ```bash
    az login
 
-   az pipelines variable-group create
-     --organization=https://dev.azure.com/<yourAzDOOrg>/
-     --project='<yourAzDOProject>'
-     --name AI.LZ.Keys
-     --variables
-         appName='<uniqueString>-ailz'
-         resourceGroupPrefix='rg-ailz'
-         AdminIpAddress='<yourPublicIpAddress>'       (optional - if you want to get access to the KV and ACR)
-         AdminPrincipalId='<yourAdminPrincipalId>'    (optional - if you want to get access to the KV and ACR)
+   az pipelines variable-group create `
+     --organization=https://dev.azure.com/<yourAzDOOrg>/ `
+     --project='<yourAzDOProject>' `
+     --name AI.LZ.Secrets `
+     --variables `
+         APP_NAME='myailz' `
+         RESOURCEGROUP_PREFIX='rg-ailz' `
+         COST_CENTER='9999999' `
+         APPLICATION_OWNER='SomeAppOwner' `
+         BUSINESS_OWNER='SomeBusOwner' `
+         CREATED_BY='SomeCreator' `
+         OWNER_EMAIL='applicationowner@company.com' `
+         MY_IP_ADDRESS='<yourPublicIpAddress>' `
+         USER_PRINCIPAL_ID='<yourAdminPrincipalId>'
 ```
 
 ## Resource Group Name
@@ -83,10 +88,25 @@ See [Azure DevOps Service Connections](https://learn.microsoft.com/en-us/azure/d
 Customize your deploy by editing the [vars/var-common.yml](./vars/var-common.yml) file. This file contains the following variables which you can change:
 
 ```bash
-- name: location
-  value: 'eastus2'
-- name: openAI_deploy_location 
-  value:  'eastus2'
+  - name: INSTANCE_NUMBER
+    value: '001'
+  - name: GLOBAL_REGION_CODE
+    value: 'US'
+```
+
+## Update the Environment Specific Variables File with your settings
+
+Customize your deploy by editing the [vars/var-dev.yml](./vars/var-dev.yml) file. This file contains the following variables which you can change:
+
+```bash
+  - name:   RESOURCEGROUP_LOCATION
+    value: 'eastus2'
+  - name:   AIFOUNDRY_DEPLOY_LOCATION
+    value: 'eastus2'
+  - name:   OPENAI_DEPLOY_LOCATION
+    value: 'eastus2'
+  - name:   AI_MODEL_CAPACITY
+    value: '20'
 ```
 
 ## Set up the Deploy Pipelines

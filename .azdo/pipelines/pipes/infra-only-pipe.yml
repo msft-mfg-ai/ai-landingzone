@@ -13,6 +13,8 @@ parameters:
     default: 'Incremental'
   - name: singleEnvironment
     default: 'false'
+  - name: appsToDeploy
+    default: 'none'
   - name: createResourceGroup
     default: true
   - name: publicAccessEnabled
@@ -33,32 +35,31 @@ stages:
         jobs:
           - template: templates/scan-code-template.yml
             parameters:
-              environmentName: 'DEV'
+              environmentCode: 'DEV'
               runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
               runGHASScan: ${{ parameters.runGHASScan }}
 
   # ----------------------------------------------------------------------------------------------------
-  - ${{ each environmentName in parameters.environments }}:
-      - stage: CreateInfra${{ environmentName }}
+  - ${{ each environmentCode in parameters.environments }}:
+      - stage: CreateInfra${{ environmentCode }}
         # # Condition 1: wait for scan, proceed if:
         # #   a single environment is being deployed and scan is complete,
         # #   or the environment is 'dev', or if qa/prod, the previous stage (dev->qa or qa->prod) succeeded
-        # condition: or(eq(${{ parameters.singleEnvironment }}, 'true'), and(eq(upper('${{ environmentName }}'), 'DEV'), succeeded('ScanApplication')), and(eq(upper('${{ environmentName }}'), 'QA'), succeeded('CreateInfraDEV')), and(eq(upper('${{ environmentName }}'), 'PROD'), succeeded('CreateInfraQA')))
+        # condition: or(eq(${{ parameters.singleEnvironment }}, 'true'), and(eq(upper('${{ environmentCode }}'), 'DEV'), succeeded('ScanApplication')), and(eq(upper('${{ environmentCode }}'), 'QA'), succeeded('CreateInfraDEV')), and(eq(upper('${{ environmentCode }}'), 'PROD'), succeeded('CreateInfraQA')))
         # Condition 2: don't wait for scan, proceed if:
         #   the environment is 'dev', or if qa/prod, the previous stage (dev->qa or qa->prod) succeeded
-        condition: or(eq(${{ parameters.singleEnvironment }}, 'true'), eq(upper('${{ environmentName }}'), 'DEV'), and(eq(upper('${{ environmentName }}'), 'QA'), succeeded('CreateInfraDEV')), and(eq(upper('${{ environmentName }}'), 'PROD'), succeeded('CreateInfraQA')))
-        displayName: Create ${{ environmentName }} Resources
+        condition: or(eq(${{ parameters.singleEnvironment }}, 'true'), eq(upper('${{ environmentCode }}'), 'DEV'), and(eq(upper('${{ environmentCode }}'), 'QA'), succeeded('CreateInfraDEV')), and(eq(upper('${{ environmentCode }}'), 'PROD'), succeeded('CreateInfraQA')))
+        displayName: Create ${{ environmentCode }} Resources
         jobs:
           - template: templates/create-infra-template.yml
             parameters:
-              environmentName: ${{ environmentName }}
+              environmentCode: ${{ environmentCode }}
               templateFolderName: ${{ parameters.templateFolderName }}
               templateFileName: 'main-${{ parameters.bicepVersion }}.bicep'
               parameterFileName: 'main-${{ parameters.bicepVersion }}-azdo.bicepparam'
               createResourceGroup: ${{ parameters.createResourceGroup }}
               publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
               createDnsZones: ${{ parameters.createDnsZones }}
-              deployAIHub: ${{ parameters.deployAIHub }}
-              deployBatchApp: ${{ parameters.deployBatchApp }}
+              appsToDeploy: ${{ parameters.appsToDeploy }}
               addRoleAssignments: ${{ parameters.addRoleAssignments }}
               deploymentMode: ${{ parameters.deploymentMode }}

@@ -11,10 +11,10 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-  - ${{ each environmentName in parameters.environments }}:
+  - ${{ each environmentCode in parameters.environments }}:
     - ${{ each app in parameters.apps }}:
-      - stage: Deploy${{ app.containerAppName }}${{ environmentName }}Service
-        displayName: Deploy ${{ app.containerAppName }} ${{ environmentName }}
+      - stage: Deploy${{ app.containerAppName }}${{ environmentCode }}Service
+        displayName: Deploy ${{ app.containerAppName }} ${{ environmentCode }}
         jobs:
           - template: templates/aca-deploy-template.yml
             parameters:
@@ -22,4 +22,4 @@ stages:
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
-              environmentName: ${{ environmentName }}
+              environmentCode: ${{ environmentCode }}

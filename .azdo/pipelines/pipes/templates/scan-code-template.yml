@@ -9,7 +9,7 @@
 # See https://marketplace.visualstudio.com/items?itemName=ms-securitydevops.microsoft-security-devops-azdevops
 # ----------------------------------------------------------------------------------------------------
 parameters:
-  - name: environmentName
+  - name: environmentCode
     default: 'DEV'
   - name: runGHASScan
     default: 'false'
@@ -24,7 +24,7 @@ parameters:
 jobs:
   - deployment: CodeScanDeployment${{parameters.codeSection}}
     displayName: Initialize Code Scans ${{parameters.codeSection}}
-    environment: ${{ parameters.environmentName }}
+    environment: ${{ parameters.environmentCode }}
 
   # ----------------------------------------------------------------------------------------------------
   - ${{ if and(eq(lower(parameters.runGHASScan), 'false'), eq(lower(parameters.runMSDevSecOpsScan), 'false')) }}:
@@ -47,11 +47,11 @@ jobs:
           - ${{ if eq(lower(parameters.codeSection), 'console') }}:
               - template: ../../vars/var-source-location-console.yml
           # Bring in environment specific variable files
-          - ${{ if eq(lower(parameters.environmentName), 'dev') }}:
+          - ${{ if eq(lower(parameters.environmentCode), 'dev') }}:
               - template: ../../vars/var-dev.yml
-          - ${{ if eq(lower(parameters.environmentName), 'qa') }}:
+          - ${{ if eq(lower(parameters.environmentCode), 'qa') }}:
               - template: ../../vars/var-qa.yml
-          - ${{ if eq(lower(parameters.environmentName), 'prod') }}:
+          - ${{ if eq(lower(parameters.environmentCode), 'prod') }}:
               - template: ../../vars/var-prod.yml
         steps:
           # Very basic simple example that might work sometimes...
@@ -159,11 +159,11 @@ jobs:
           - ${{ if eq(lower(parameters.codeSection), 'console') }}:
               - template: ../../vars/var-source-location-console.yml
           # Bring in environment specific variable files
-          - ${{ if eq(lower(parameters.environmentName), 'dev') }}:
+          - ${{ if eq(lower(parameters.environmentCode), 'dev') }}:
               - template: ../../vars/var-dev.yml
-          - ${{ if eq(lower(parameters.environmentName), 'qa') }}:
+          - ${{ if eq(lower(parameters.environmentCode), 'qa') }}:
               - template: ../../vars/var-qa.yml
-          - ${{ if eq(lower(parameters.environmentName), 'prod') }}:
+          - ${{ if eq(lower(parameters.environmentCode), 'prod') }}:
               - template: ../../vars/var-prod.yml
         steps:
           - bash: |

@@ -3,7 +3,7 @@
 # This template is optimized for a Linux build agent -- see create-infra-win.yml for a Windows build agent
 # ----------------------------------------------------------------------------------------------------
 parameters:
-  - name: environmentName
+  - name: environmentCode
     default: 'DEV'
   - name: templateFolderName
     default: 'infra/bicep'
@@ -21,28 +21,30 @@ parameters:
     default: false
   - name: createDnsZones
     default: true
-  - name: deployAIHub
-    default: true
-  - name: deployBatchApp
-    default: true
+  - name: appsToDeploy
+    default: 'none'
   - name: addRoleAssignments
     default: true
+  - name: projectName
+    default: ''
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
   - deployment: CreateInfra
-    displayName: Initialize Create ${{ parameters.environmentName }} Infra
-    environment: ${{ parameters.environmentName }}
+    displayName: Initialize Create ${{ parameters.environmentcode }} Infra
+    environment: ${{ parameters.environmentcode }}
 
-  - job: Create${{ parameters.environmentName }}InfraJob
-    displayName: Create ${{ parameters.environmentName }} Infrastructure
+  - job: Create${{ parameters.environmentcode }}InfraJob
+    displayName: Create ${{ parameters.environmentcode }} Infrastructure
     variables:
-      - name: environmentName
-        value: ${{ parameters.environmentName }}
-      - name: environmentNameUpper
-        value: ${{ upper(parameters.environmentName) }}
-      - name: environmentNameLower
-        value: ${{ lower(parameters.environmentName) }}
+      - name: environmentCode
+        value: ${{ parameters.environmentcode }}
+      - name: environment_Code  # needed for the parameter file so it will match GH Action...
+        value: ${{ parameters.environmentcode }}
+      - name: environmentCodeUpper
+        value: ${{ upper(parameters.environmentcode) }}
+      - name: environmentCodeLower
+        value: ${{ lower(parameters.environmentcode) }}
       - name: templateFile
         value: '$(Pipeline.Workspace)/s/${{ parameters.templateFolderName }}/${{ parameters.templateFileName }}'
       - name: parameterFile
@@ -50,12 +52,10 @@ jobs:
 
       - name: publicAccessEnabled
         value: '${{ lower(parameters.publicAccessEnabled) }}'
-      - name: createDnsZones
-        value: '${{ lower(parameters.createDnsZones) }}'
-      - name: deployAIHub
-        value: '${{ lower(parameters.deployAIHub) }}'
-      - name: deployBatchApp
-        value: '${{ lower(parameters.deployBatchApp) }}'
+      - name: appsToDeployParm
+        value: ${{ parameters.appsToDeploy }}
+      - name: deployUIApp
+        value: ${{ contains(lower(parameters.appsToDeploy), 'ui') }}
       - name: addRoleAssignments
         value: '${{ lower(parameters.addRoleAssignments) }}'
 
@@ -65,11 +65,11 @@ jobs:
       - template: ../../vars/var-source-location-app.yml
 
       # Bring in environment specific variable files
-      - ${{ if eq(lower(parameters.environmentName), 'dev') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
           - template: ../../vars/var-dev.yml
-      - ${{ if eq(lower(parameters.environmentName), 'qa') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
           - template: ../../vars/var-qa.yml
-      - ${{ if eq(lower(parameters.environmentName), 'prod') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
           - template: ../../vars/var-prod.yml
 
     # ----------------------------------------------------------------------------------------------------
@@ -81,17 +81,26 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            $environmentNameLower="${{ parameters.environmentName }}".ToLower()
-            echo "##vso[task.setvariable variable=environmentNameLower]$environmentNameLower"
+            $environmentCodeLower="${{ parameters.environmentcode }}".ToLower()
+            echo "##vso[task.setvariable variable=environmentCodeLower]$environmentCodeLower"
 
-            $appNameLower="$(appName)".ToLower()
+            $appNameLower="$(APP_NAME)".ToLower()
             echo "##vso[task.setvariable variable=appNameLower]$appNameLower"
 
-            $appNameLowerNoDashes="$(appName)".ToLower().Replace("-", "")
+            $appNameLowerNoDashes="$(APP_NAME)".ToLower().Replace("-", "")
             echo "##vso[task.setvariable variable=appNameLowerNoDashes]$appNameLowerNoDashes"
 
-            $resourceGroupName="$(resourceGroupPrefix)-$environmentNameLower".ToLower()
-            echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
+            $projectName = "${{ parameters.projectName }}"
+            if ([string]::IsNullOrWhiteSpace($projectName)) {
+              $resourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)").ToLower()
+            }
+            else {
+              $resourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower--$(INSTANCE_NUMBER)-$projectName").ToLower()
+            }
+            Write-Host "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
+
+            $rootResourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)").ToLower()
+            Write-Host "##vso[task.setvariable variable=rootResourceGroupName]$rootResourceGroupName"
 
             $runDateTime=(Get-Date).ToString("yyyyMMdd-HHmmss")
             echo "##vso[task.setvariable variable=runDateTime]$runDateTime"
@@ -99,15 +108,18 @@ jobs:
             echo "##vso[task.setvariable variable=runDateTimeZ]$runDateTimeZ"
 
       - bash: |
-          echo "environmentName=${{ parameters.environmentName }}"
+          echo "environmentCode=${{ parameters.environmentcode }}"
           echo "templateFolderName=${{ parameters.templateFolderName }}"
           echo "templateFileName=${{ parameters.templateFileName }}"
           echo "templateFile=$(templateFile)"
           echo "parameterFileName=${{ parameters.parameterFileName }}"
           echo "parameterFile=$(parameterFile)"
           echo "deploymentMode=${{ parameters.deploymentMode }}"
+          echo "RESOURCEGROUP_PREFIX=$(RESOURCEGROUP_PREFIX)"
+          echo "instanceNumber=$(INSTANCE_NUMBER)"
           echo "resourceGroupName=$(resourceGroupName)"
-          echo "appName=$(appName)"
+          echo "rootResourceGroupName=$(rootResourceGroupName)"
+          echo "appName=$(APP_NAME)"
           echo "appNameLower=$(appNameLower)"
           echo "appNameLowerNoDashes=$(appNameLowerNoDashes)"
           echo "runDateTime=$(runDateTime)"
@@ -115,12 +127,9 @@ jobs:
 
           echo "publicAccessEnabled=$(publicAccessEnabled)"
           echo "parameters.publicAccessEnabled=${{ parameters.publicAccessEnabled }}"
-          echo "createDnsZones=$(createDnsZones)"
-          echo "parameters.createDnsZones=${{ parameters.createDnsZones }}"
-          echo "deployAIHub=$(deployAIHub)"
-          echo "deployBatchApp=$(deployBatchApp)"
-          echo "parameters.deployAIHub=${{ parameters.deployAIHub }}"
-          echo "parameters.deployBatchApp=${{ parameters.deployBatchApp }}"
+          echo "parameters.appsToDeploy=${{ parameters.appsToDeploy }}"
+          echo "appsToDeployParm=$(appsToDeployParm)"
+          echo "deployUIApp=$(deployUIApp)"
           echo "addRoleAssignments=$(addRoleAssignments)"
           echo "parameters.addRoleAssignments=${{ parameters.addRoleAssignments }}"
 
@@ -155,21 +164,21 @@ jobs:
       # in order to use multiple dynamic service connections, you can't just use a variable.
       # they need to be defined and available at YML pre-compile time, so use this technique.
       # this switch allows you to dynamically select a 'hard-coded' service connection
-      - ${{ if eq(variables.environmentNameUpper, 'DEV') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'DEV') }}:
           - template: steps-deploy-bicep-template.yml
             parameters:
               serviceConnectionName: $(serviceConnectionDEV)
               createResourceGroup: ${{ parameters.createResourceGroup }}
               deployToResourceGroup: ${{ parameters.deployToResourceGroup }}
               resourceGroupName: $(resourceGroupName)
-      - ${{ if eq(variables.environmentNameUpper, 'QA') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'QA') }}:
           - template: steps-deploy-bicep-template.yml
             parameters:
               serviceConnectionName: $(serviceConnectionQA)
               createResourceGroup: ${{ parameters.createResourceGroup }}
               deployToResourceGroup: ${{ parameters.deployToResourceGroup }}
               resourceGroupName: $(resourceGroupName)
-      - ${{ if eq(variables.environmentNameUpper, 'PROD') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'PROD') }}:
           - template: steps-deploy-bicep-template.yml
             parameters:
               serviceConnectionName: $(serviceConnectionPROD)

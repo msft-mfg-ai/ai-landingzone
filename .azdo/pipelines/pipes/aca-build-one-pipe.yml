@@ -14,15 +14,15 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-- ${{ each environmentName in parameters.environments }}:
+- ${{ each environmentCode in parameters.environments }}:
   - ${{ each app in parameters.apps }}:
-    - stage: Build${{ app.containerAppName }}${{ environmentName }}Service
-      displayName: Build ${{ app.containerAppName }} ${{ environmentName }}
+    - stage: Build${{ app.containerAppName }}${{ environmentCode }}Service
+      displayName: Build ${{ app.containerAppName }} ${{ environmentCode }}
       jobs:
         - template: templates/aca-build-one-template.yml
           parameters:
             serviceConnectionName: $(serviceConnectionName)
             acrAppName: ${{ app.acrAppName }}
             projectFolderName: ${{ app.projectFolderName }}
-            environmentName: ${{ environmentName }}
+            environmentCode: ${{ environmentCode }}
             pushToACR: ${{ parameters.pushToACR }}

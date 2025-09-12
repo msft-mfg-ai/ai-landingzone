@@ -1,13 +1,13 @@
 # ----------------------------------------------------------------------------------------------------
 # Template to build a Azure Container App Docker image and put it to a container registry
 # ----------------------------------------------------------------------------------------------------
-# This template gets the appName from the variable group: AI.LZ.Keys
+# This template gets the appName from the variable group: AI.LZ.Secrets
 #   and the resource group name from /vars/var-<env>.yml
 # ----------------------------------------------------------------------------------------------------
 parameters:
   - name: serviceConnectionName
     type: string
-  - name: environmentName
+  - name: environmentCode
     type: string
     default: 'DEV'
   - name: acrAppName
@@ -28,20 +28,20 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
-  - deployment: Build${{ parameters.acrAppName }}${{ parameters.environmentName }}App
-    displayName: Init Build ${{ parameters.acrAppName }} ${{ parameters.environmentName }}
-    environment: ${{ parameters.environmentName }}
+  - deployment: Build${{ parameters.acrAppName }}${{ parameters.environmentcode }}App
+    displayName: Init Build ${{ parameters.acrAppName }} ${{ parameters.environmentcode }}
+    environment: ${{ parameters.environmentcode }}
 
-  - job: Build${{ parameters.acrAppName }}${{ parameters.environmentName }}Job
-    displayName: Build ${{ parameters.acrAppName }} ${{ parameters.environmentName }}
+  - job: Build${{ parameters.acrAppName }}${{ parameters.environmentcode }}Job
+    displayName: Build ${{ parameters.acrAppName }} ${{ parameters.environmentcode }}
     variables:
-      - group: AI.LZ.Keys # need to get the appName from here
+      - group: AI.LZ.Secrets # need to get the appName from here
       # Bring in environment specific variable files
-      - ${{ if eq(lower(parameters.environmentName), 'dev') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
           - template: ../../vars/var-dev.yml
-      - ${{ if eq(lower(parameters.environmentName), 'qa') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
           - template: ../../vars/var-qa.yml
-      - ${{ if eq(lower(parameters.environmentName), 'prod') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
           - template: ../../vars/var-prod.yml
 
     steps:
@@ -55,14 +55,14 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            $environmentNameLower="${{ parameters.environmentName }}".ToLower()
-            echo "##vso[task.setvariable variable=environmentNameLower]$environmentNameLower"
-            $appNameLower="$(appName)".ToLower()
+            $environmentCodeLower="${{ parameters.environmentcode }}".ToLower()
+            echo "##vso[task.setvariable variable=environmentCodeLower]$environmentCodeLower"
+            $appNameLower="$(APP_NAME)".ToLower()
             echo "##vso[task.setvariable variable=appNameLower]$appNameLower"
-            $appNameNoDashesLower="$(appName)".ToLower().Replace("-", "")
+            $appNameNoDashesLower="$(APP_NAME)".ToLower().Replace("-", "")
             echo "##vso[task.setvariable variable=appNameNoDashesLower]$appNameNoDashesLower"
 
-            $resourceGroupName="$(resourceGroupPrefix)-$environmentNameLower".ToLower()
+            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower".ToLower()
             echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
             
             $acrAppNameLower="${{ parameters.acrAppName }}".ToLower()
@@ -73,9 +73,9 @@ jobs:
             echo "##vso[task.setvariable variable=imageName]$imageName"
             $imageNameBranch="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.SourceBranchName)"
             echo "##vso[task.setvariable variable=imageNameBranch]$imageNameBranch"
-            $containerRegistryName="$($appNameNoDashesLower)cr$($environmentNameLower)"
+            $containerRegistryName="$($appNameNoDashesLower)cr$($environmentCodeLower)"
             echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
-            $containerRegistryUrl="$($appNameNoDashesLower)cr$($environmentNameLower).azurecr.io"
+            $containerRegistryUrl="$($appNameNoDashesLower)cr$($environmentCodeLower).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
             $agentIpAddress = $(Invoke-WebRequest -Uri "https://api.ipify.org").Content
             echo "##vso[task.setvariable variable=agentIpAddress]$agentIpAddress"

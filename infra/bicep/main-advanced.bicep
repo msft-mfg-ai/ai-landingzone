@@ -91,8 +91,6 @@ param vm_name string?
 // --------------------------------------------------------------------------------------------------------------
 // Container App Environment
 // --------------------------------------------------------------------------------------------------------------
-@description('Name of the Container Apps Environment workload profile to use for the app')
-param appContainerAppEnvironmentWorkloadProfileName string = containerAppEnvironmentWorkloadProfiles[0].name
 @description('Workload profiles for the Container Apps environment')
 param containerAppEnvironmentWorkloadProfiles array = [
   {
@@ -102,6 +100,8 @@ param containerAppEnvironmentWorkloadProfiles array = [
     maximumCount: 10
   }
 ]
+@description('Name of the Container Apps Environment workload profile to use for the app')
+param appContainerAppEnvironmentWorkloadProfileName string = containerAppEnvironmentWorkloadProfiles[0].name
 
 // --------------------------------------------------------------------------------------------------------------
 // Container App Entra Parameters
@@ -232,7 +232,6 @@ param runDateTime string = utcNow()
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
 param businessOwnerTag string = 'UNKNOWN'
-param requestorNameTag string = 'UNKNOWN'
 param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
 param costCenterTag string = 'UNKNOWN'
@@ -253,7 +252,6 @@ var tags = {
   'created-by': createdByTag
   'application-name': applicationName
   'environment-name': environmentName
-  'requestor-name': requestorNameTag
   'application-owner': applicationOwnerTag
   'business-owner': businessOwnerTag
   'cost-center': costCenterTag

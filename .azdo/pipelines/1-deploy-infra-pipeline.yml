@@ -36,10 +36,18 @@ parameters:
     displayName: Basic or Advanced
     type: string
     values:
-      - test
       - basic
       - advanced
-    default: test
+    #  - test
+    default: basic
+
+  - name: appsToDeploy
+    displayName: Which Apps to build and deploy?
+    type: string
+    values:
+      - ui
+      - none
+    default: 'ui'
 
   - name: bicepDeploymentMode
     displayName: Deploy Mode
@@ -54,10 +62,17 @@ parameters:
     displayName: Create Resource Group?
     type: boolean
     default: true
+
   - name: addRoleAssignments
     displayName: Add Role Assignments?
     type: boolean
     default: true
+
+  - name: publicAccessEnabled
+    displayName: Make Web Apps Public?
+    type: boolean
+    default: true
+
   - name: runMSDevSecOpsScan
     displayName: Run MS DevSecOps Scan?
     type: boolean
@@ -65,7 +80,7 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 variables:
-  - group: AI.LZ.Keys
+  - group: AI.LZ.Secrets
   - template: vars/var-service-connections.yml
 
 # ----------------------------------------------------------------------------------------------------
@@ -75,18 +90,22 @@ stages:
         parameters:
           environments: ['${{ parameters.deployToEnvironment }}']
           bicepVersion: '${{ parameters.bicepVersion }}'
-          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
-          runGHASScan: false
           singleEnvironment: 'true'
           createResourceGroup: ${{ parameters.createResourceGroup }}
+          publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
+          appsToDeploy: ${{ parameters.appsToDeploy }}
           addRoleAssignments: ${{ parameters.addRoleAssignments }}
+          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+          runGHASScan: false
 
   - ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
       - template: pipes/infra-only-pipe.yml
         parameters:
           environments: ['DEV', 'QA', 'PROD']
           bicepVersion: '${{ parameters.bicepVersion }}'
+          createResourceGroup: ${{ parameters.createResourceGroup }}
+          publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
+          appsToDeploy: ${{ parameters.appsToDeploy }}
+          addRoleAssignments: ${{ parameters.addRoleAssignments }}
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
           runGHASScan: false
-          createResourceGroup: ${{ parameters.createResourceGroup }}
-          addRoleAssignments: ${{ parameters.addRoleAssignments }}

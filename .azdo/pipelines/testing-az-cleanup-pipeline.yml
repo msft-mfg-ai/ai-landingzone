@@ -18,7 +18,7 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 variables:
-  - group: AI.LZ.Keys
+  - group: AI.LZ.Secrets
   - template: vars/var-service-connections.yml
   - name: resourceGroupName
     value: rg-ai-docs-dev

@@ -1,13 +1,13 @@
 # ----------------------------------------------------------------------------------------------------
 # Template to deploy a Docker image to a Container App
 # ----------------------------------------------------------------------------------------------------
-# This template gets the appName from the variable group: AI.LZ.Keys
+# This template gets the appName from the variable group: AI.LZ.Secrets
 #   and the resource group name from /vars/var-<env>.yml
 # ----------------------------------------------------------------------------------------------------
 parameters:
   - name: serviceConnectionName
     type: string
-  - name: environmentName
+  - name: environmentCode
     default: 'DEV'
     type: string
   - name: containerAppName
@@ -25,20 +25,20 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
-  - deployment: InitDeploy${{ parameters.containerAppName }}${{ parameters.environmentName }}
-    displayName: Init Deploy ${{ parameters.containerAppName }} ${{ parameters.environmentName }}
-    environment: ${{ parameters.environmentName }}
+  - deployment: InitDeploy${{ parameters.containerAppName }}${{ parameters.environmentcode }}
+    displayName: Init Deploy ${{ parameters.containerAppName }} ${{ parameters.environmentcode }}
+    environment: ${{ parameters.environmentcode }}
 
-  - job: DeployApp${{ parameters.containerAppName }}${{ parameters.environmentName }}Job
-    displayName: Deploy ${{ parameters.containerAppName }} ${{ parameters.environmentName }}
+  - job: DeployApp${{ parameters.containerAppName }}${{ parameters.environmentcode }}Job
+    displayName: Deploy ${{ parameters.containerAppName }} ${{ parameters.environmentcode }}
     variables:
-      - group: AI.LZ.Keys # need to get the appName from here
+      - group: AI.LZ.Secrets # need to get the appName from here
       # Bring in environment specific variable files
-      - ${{ if eq(lower(parameters.environmentName), 'dev') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
           - template: ../../vars/var-dev.yml
-      - ${{ if eq(lower(parameters.environmentName), 'qa') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
           - template: ../../vars/var-qa.yml
-      - ${{ if eq(lower(parameters.environmentName), 'prod') }}:
+      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
           - template: ../../vars/var-prod.yml
 
     steps:
@@ -52,23 +52,23 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            $appNameNoDashesLower="$(appName)".ToLower().Replace("-", "")
-            $environmentNameLower="${{ parameters.environmentName }}".ToLower()
+            $appNameNoDashesLower="$(APP_NAME)".ToLower().Replace("-", "")
+            $environmentCodeLower="${{ parameters.environmentcode }}".ToLower()
             $containerAppNameLower="${{ parameters.containerAppName }}".ToLower()
             $acrFolderNameLower="${{ parameters.acrFolderName }}".ToLower()
             $acrAppNameLower="${{ parameters.acrAppName }}".ToLower()
 
-            $resourceGroupName="$(resourceGroupPrefix)-$environmentNameLower".ToLower()
+            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower".ToLower()
             echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
             
-            $caAppName="$($appNameNoDashesLower)-ca-$($containerAppNameLower)-$($environmentNameLower)"
+            $caAppName="$($appNameNoDashesLower)-ca-$($containerAppNameLower)-$($environmentCodeLower)"
             echo "##vso[task.setvariable variable=caAppName]$caAppName"
-            $containerRegistryUrl="$($appNameNoDashesLower)cr$($environmentNameLower).azurecr.io"
+            $containerRegistryUrl="$($appNameNoDashesLower)cr$($environmentCodeLower).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
             $imageName="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.BuildId)"
             echo "##vso[task.setvariable variable=imageName]$imageName"
 
-            echo "environmentNameLower=$environmentNameLower"
+            echo "environmentCodeLower=$environmentCodeLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"
             echo "resourceGroupName=$resourceGroupName"
             echo "containerAppNameLower=$containerAppNameLower"

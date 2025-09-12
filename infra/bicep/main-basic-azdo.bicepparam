@@ -3,13 +3,17 @@
 // Note: This is dynamically modified by the build process.
 // Anything that starts with a # and a { is a variable that will be replaced at runtime.
 // --------------------------------------------------------------------------------
-// The following values should be defined in GitHub Secrets or Environment Variables:
-//   APP_NAME            - GH Repository Variable - no need to override
-//   USER_PRINCIPAL_ID   - GH Environment Secret - User Principal ID - this is you - BYO User
-//   INSTANCE_NUMBER     - GH Environment Variable
-//   OWNER_EMAIL         - GH Environment Variable - optional
-//   runBuildDeployAPI    - Runtime  - User decision to deploy webapp or not
-//   environmentName     - Runtime  - Environment Code (e.g., dev, qa, prod)
+// The following values should be defined in Azure Library Variables:
+//   APP_NAME='myailz' `
+//   RESOURCEGROUP_PREFIX ='rg-ailz' `
+//   COST_CENTER          ='9999999' `
+//   APPLICATION_OWNER    ='SomeAppOwner' `
+//   BUSINESS_OWNER       ='SomeBusOwner' `
+//   CREATED_BY           ='SomeCreator' `
+//   OWNER_EMAIL          ='applicationowner@company.com' `
+//   MY_IP_ADDRESS        ='<yourPublicIpAddress>' `
+//   USER_PRINCIPAL_ID    ='<yourAdminPrincipalId>'
+//   ENVIRONMENT_CODE     = Runtime  - Environment Code (e.g., dev, qa, prod)
 // --------------------------------------------------------------------------------
 
 using './main-basic.bicep'
@@ -21,7 +25,6 @@ param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
 
 param businessOwnerTag  = '#{BUSINESS_OWNER}#'
-param requestorNameTag  = '#{REQUESTOR_NAME}#'
 param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
 param costCenterTag  = '#{COST_CENTER}#'
 
@@ -46,14 +49,7 @@ param publicAccessEnabled = true
 param makeWebAppsPublic = true
 
 param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') == 'true'
-// Should we deploy the API Management service?
-param deployAPIApp = empty('#{deployAPI}#') ? false : toLower('#{deployAPI}#') == 'true'
-// Should we deploy the API app?
-param deployUIApp = empty('#{deployUI}#') ? false : toLower('#{deployUI}#') == 'true'
-// Should we deploy the UI app?
-
-// applications
-param apiImageName = empty('#{API_IMAGE_NAME}#') ? null : '#{API_IMAGE_NAME}#'
+param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
 
 // only for Microsoft internal deployments
