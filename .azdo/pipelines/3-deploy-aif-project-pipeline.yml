@@ -43,26 +43,23 @@ parameters:
     displayName: Create Resource Group?
     type: boolean
     default: true
-  - name: publicAccessEnabled
-    displayName: Public Access Enabled?
-    type: boolean
-    default: true
-  - name: createDnsZones
-    displayName: Create DNS Zones?
-    type: boolean
-    default: true
-  - name: addRoleAssignments
-    displayName: Add Role Assignments?
-    type: boolean
-    default: true
-  - name: runGHASScan
-    displayName: Run GHAS Scan?
-    type: boolean
-    default: false
+  - name: projectName
+    displayName: Project Name (change x to match Project Number)
+    type: string
+    default: 'aiprojX'
+  - name: projectNumber
+    displayName: Project Number
+    type: string
+    default: '00X'
   - name: runMSDevSecOpsScan
     displayName: Run MS DevSecOps Scan?
     type: boolean
     default: false
+
+  # - name: runGHASScan
+  #   displayName: Run GHAS Scan?
+  #   type: boolean
+  #   default: false
 
 # ----------------------------------------------------------------------------------------------------
 variables:
@@ -76,11 +73,12 @@ stages:
         parameters:
           environments: ['${{ parameters.deployToEnvironment }}']
           bicepVersion: 'project'
+          projectName: ${{ parameters.projectName }}
+          projectNumber: ${{ parameters.projectNumber }}
           singleEnvironment: 'true'
           createResourceGroup: ${{ parameters.createResourceGroup }}
-          publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
           appsToDeploy: 'none'
-          addRoleAssignments: ${{ parameters.addRoleAssignments }}
+          addRoleAssignments: 'true'
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
           runGHASScan: false
 
@@ -89,9 +87,10 @@ stages:
         parameters:
           environments: ['DEV', 'QA', 'PROD']
           bicepVersion: 'project'
+          projectName: ${{ parameters.projectName }}
+          projectNumber: ${{ parameters.projectNumber }}
           createResourceGroup: ${{ parameters.createResourceGroup }}
-          publicAccessEnabled: ${{ parameters.publicAccessEnabled }}
           appsToDeploy: 'none'
-          addRoleAssignments: ${{ parameters.addRoleAssignments }}
+          addRoleAssignments: 'true'
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
           runGHASScan: false

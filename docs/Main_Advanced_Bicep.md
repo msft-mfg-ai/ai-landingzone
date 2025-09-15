@@ -51,8 +51,8 @@ The `main-advanced.bicep` file is designed to deploy an advanced version of the 
   - Scoring
 
 ### Virtual Machine Configuration
-- `admin_username` (string): Admin username for VM
-- `admin_password` (string, secure): Admin password for VM
+- `VM_USERNAME` (string): Admin username for VM
+- `vm_password` (string, secure): Admin password for VM
 - `vm_name` (string): VM name
 
 ### Container Registry

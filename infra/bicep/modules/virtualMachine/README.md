@@ -16,8 +16,8 @@ This module deploys a virtual machine (VM) in Azure with configurable Windows or
 |-----------|------|---------|-------------|
 | `vm_name` | string | (required) | Name of the Virtual Machine |
 | `location` | string | resourceGroup().location | Location for all resources |
-| `admin_username` | string | (required) | Admin username for the VM |
-| `admin_password` | secureString | (required) | Admin password for the VM |
+| `vm_username` | string | (required) | Admin username for the VM |
+| `vm_password` | secureString | (required) | Admin password for the VM |
 | `vnet_id` | string | (required) | Virtual Network resource ID |
 | `subnet_name` | string | (required) | Subnet name within the Virtual Network |
 | `vm_size` | string | Standard_D4s_v5 | VM size |
@@ -41,8 +41,8 @@ module jumpboxVM './modules/virtualMachine/virtualMachine.bicep' = {
   name: 'jumpboxVirtualMachineDeployment'
   params: {
     vm_name: 'jumpbox-vm'
-    admin_username: 'azureuser'
-    admin_password: 'SecurePassword123!'
+    vm_username: 'azureuser'
+    vm_password: 'SecurePassword123!'
     vnet_id: vnet.outputs.vnetResourceId
     subnet_name: 'snet-jumpbox'
     os_type: 'Linux'
@@ -103,11 +103,11 @@ The module creates a Network Security Group with:
 The VM module is conditionally deployed in main-advanced.bicep when VM parameters are provided:
 
 ```bicep
-module virtualMachine './modules/virtualMachine/virtualMachine.bicep' = if (!empty(admin_username) && !empty(admin_password) && !empty(vm_name)) {
+module virtualMachine './modules/virtualMachine/virtualMachine.bicep' = if (!empty(vm_username) && !empty(vm_password) && !empty(vm_name)) {
   name: 'jumpboxVirtualMachineDeployment'
   params: {
-    admin_username: admin_username 
-    admin_password: admin_password 
+    vm_username: vm_username 
+    vm_password: vm_password 
     vm_name: vm_name
     subnet_name: resourceNames.outputs.subnetJumpboxName
     vnet_id: vnet.outputs.vnetResourceId
@@ -121,8 +121,8 @@ module virtualMachine './modules/virtualMachine/virtualMachine.bicep' = if (!emp
 ```
 
 To deploy with a jumpbox VM, provide the required parameters:
-- `admin_username`
-- `admin_password` 
+- `vm_username`
+- `vm_password` 
 - `vm_name`
 
 If any of these are empty, the VM will not be deployed.

@@ -22,13 +22,13 @@
         "description": "Location for all resources."
       }
     },
-    "admin_username": {
+    "vm_username": {
       "type": "string",
       "metadata": {
         "description": "Admin username for the VM"
       }
     },
-    "admin_password": {
+    "vm_password": {
       "type": "securestring",
       "metadata": {
         "description": "Admin password for the VM"
@@ -160,8 +160,8 @@
         },
         "osProfile": {
           "computerName": "[parameters('vm_name')]",
-          "adminUsername": "[parameters('admin_username')]",
-          "adminPassword": "[parameters('admin_password')]",
+          "adminUsername": "[parameters('vm_username')]",
+          "adminPassword": "[parameters('vm_password')]",
           "windowsConfiguration": "[if(equals(parameters('os_type'), 'Windows'), createObject('enableAutomaticUpdates', true(), 'patchSettings', createObject('patchMode', 'AutomaticByOS')), null())]",
           "linuxConfiguration": "[if(equals(parameters('os_type'), 'Linux'), createObject('disablePasswordAuthentication', false(), 'patchSettings', createObject('patchMode', 'ImageDefault')), null())]"
         },

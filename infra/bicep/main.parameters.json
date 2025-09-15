@@ -41,11 +41,11 @@
     "openAI_deploy_location": {
       "value": "${OPENAI_DEPLOY_LOCATION}"
     },
-    "admin_username": {
-      "value": "${ADMIN_USERNAME}"
+    "vm_username": {
+      "value": "${VM_USERNAME}"
     },
-    "admin_password": {
-      "value": "${ADMIN_PASSWORD}"
+    "vm_password": {
+      "value": "${VM_PASSWORD}"
     },
     "vm_name": {
       "value": "${VM_NAME}"

@@ -27,6 +27,8 @@ parameters:
     default: true
   - name: projectName
     default: ''
+  - name: projectNumber
+    default: ''
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
@@ -58,6 +60,10 @@ jobs:
         value: ${{ contains(lower(parameters.appsToDeploy), 'ui') }}
       - name: addRoleAssignments
         value: '${{ lower(parameters.addRoleAssignments) }}'
+      - name: projectName
+        value: ${{ parameters.projectName }}
+      - name: projectNumber
+        value: ${{ parameters.projectNumber }}  
 
       # Bring in environment common variable file
       - template: ../../vars/var-service-connections.yml
@@ -92,15 +98,19 @@ jobs:
 
             $projectName = "${{ parameters.projectName }}"
             if ([string]::IsNullOrWhiteSpace($projectName)) {
+              echo "Project Name not provided, using default resource group naming convention"
               $resourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)").ToLower()
             }
             else {
-              $resourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower--$(INSTANCE_NUMBER)-$projectName").ToLower()
+              echo "Project Name WAS provided, using it for resource group naming convention"
+              $resourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)-$projectName").ToLower()
             }
+            echo "resourceGroupName=$resourceGroupName"
             Write-Host "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
 
             $rootResourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)").ToLower()
             Write-Host "##vso[task.setvariable variable=rootResourceGroupName]$rootResourceGroupName"
+            echo "rootResourceGroupName=$rootResourceGroupName"
 
             $runDateTime=(Get-Date).ToString("yyyyMMdd-HHmmss")
             echo "##vso[task.setvariable variable=runDateTime]$runDateTime"
@@ -115,8 +125,10 @@ jobs:
           echo "parameterFileName=${{ parameters.parameterFileName }}"
           echo "parameterFile=$(parameterFile)"
           echo "deploymentMode=${{ parameters.deploymentMode }}"
-          echo "RESOURCEGROUP_PREFIX=$(RESOURCEGROUP_PREFIX)"
           echo "instanceNumber=$(INSTANCE_NUMBER)"
+          echo "RESOURCEGROUP_PREFIX=$(RESOURCEGROUP_PREFIX)"
+          echo "projectNumber=$(projectNumber)"
+          echo "projectName=$(projectName)"
           echo "resourceGroupName=$(resourceGroupName)"
           echo "rootResourceGroupName=$(rootResourceGroupName)"
           echo "appName=$(APP_NAME)"
