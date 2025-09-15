@@ -5,6 +5,12 @@ using chatui.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//var jsonSettingsFile = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "applicationSettings.json");
+builder.Configuration
+  //.AddJsonFile(jsonSettingsFile)
+  .AddEnvironmentVariables()
+  .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
+
 builder.Services.AddOptions<ChatApiOptions>()
     .Bind(builder.Configuration)
     .ValidateDataAnnotations()
@@ -23,7 +29,7 @@ builder.Services.AddSingleton((provider) =>
             ExcludeManagedIdentityCredential = true,
             TenantId = vsTenantId
         });
-    PersistentAgentsClient client = new(config.AIProjectEndpoint, credential);
+    PersistentAgentsClient client = new(config.AppAgentEndpoint, credential);
 
     return client;
 });
