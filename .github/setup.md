@@ -52,9 +52,7 @@ Follow these steps to get started quickly:
     gh variable set OPENAI_DEPLOY_LOCATION -b eastus2
     gh variable set INSTANCE_NUMBER -b 001
     gh variable set GLOBAL_REGION_CODE -b US
-    gh variable set DEPLOYMENTCOUNT -b 001
     gh variable set ENVCODE -b Dev
-    gh variable set INSTANCE_NUMBER -b 001
     ```
 
     For resource tags, set these variables:
@@ -65,7 +63,6 @@ Follow these steps to get started quickly:
     gh variable set COST_CENTER -b 9999999
     gh variable set CREATED_BY -b SomeCreator
     gh variable set OWNER_EMAIL -b applicationowner@company.com
-    gh variable set REQUESTOR_NAME -b SomeRequestor
     ```
 
     For each environment, you can control the AI Model capacity with this variable:
@@ -137,18 +134,12 @@ gh variable set --env <envName> USER_ASSIGNED_IDENTITY_ID -b <YOUR_MI_USER_RESOU
 
 ### Admin Rights
 
-USER_PRINCIPAL_ID is an optional settings at the environment level - set this only if you want your admin to have access to the Key Vault and Container Registry. You can customize this by environment if desired.
-
-```bash
-gh secret set --env dev USER_PRINCIPAL_ID <yourGuid>
-```
-
-<!-- ADMIN_IP_ADDRESS and USER_PRINCIPAL_ID are optional settings at the environment level - set these only if you want your admin to have access to the Key Vault and Container Registry. You can customize and run the following commands, or you can set these secrets up manually.
+ADMIN_IP_ADDRESS and USER_PRINCIPAL_ID are optional settings at the environment level - set these only if you want your admin to have access to the Key Vault and Container Registry. You can customize and run the following commands, or you can set these secrets up manually.
 
 ```bash
 gh secret set --env dev ADMIN_IP_ADDRESS 192.168.1.1
 gh secret set --env dev USER_PRINCIPAL_ID <yourGuid>
-``` -->
+```
 
 ---
 

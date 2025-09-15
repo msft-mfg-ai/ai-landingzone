@@ -3,15 +3,20 @@
 // Note: This is dynamically modified by the build process.
 // Anything that starts with a # and a { is a variable that will be replaced at runtime.
 // --------------------------------------------------------------------------------
-// The following values should be defined in GitHub Secrets or Environment Variables:
-//   APP_NAME            - GH Repository Variable - no need to override
-//   USER_PRINCIPAL_ID   - GH Environment Secret - User Principal ID - this is you - BYO User
-//   INSTANCE_NUMBER     - GH Environment Variable
-//   OWNER_EMAIL         - GH Environment Variable - optional
-//   environmentName     - Runtime  - Environment Code (e.g., dev, qa, prod)
+// The following values should be defined in Azure Library Variables:
+//   APP_NAME='myailz' `
+//   RESOURCEGROUP_PREFIX ='rg-ailz' `
+//   COST_CENTER          ='9999999' `
+//   APPLICATION_OWNER    ='SomeAppOwner' `
+//   BUSINESS_OWNER       ='SomeBusOwner' `
+//   CREATED_BY           ='SomeCreator' `
+//   OWNER_EMAIL          ='applicationowner@company.com' `
+//   MY_IP_ADDRESS        ='<yourPublicIpAddress>' `
+//   USER_PRINCIPAL_ID    ='<yourAdminPrincipalId>'
+//   ENVIRONMENT_CODE     = Runtime  - Environment Code (e.g., dev, qa, prod)
 // --------------------------------------------------------------------------------
 
-using './main-advanced.bicep'
+using './main-basic.bicep'
 
 param applicationName = '#{APP_NAME}#'
 param environmentName = '#{ENVIRONMENT_CODE}#'
@@ -20,7 +25,6 @@ param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
 
 param businessOwnerTag  = '#{BUSINESS_OWNER}#'
-param requestorNameTag  = '#{REQUESTOR_NAME}#'
 param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
 param costCenterTag  = '#{COST_CENTER}#'
 
@@ -41,25 +45,11 @@ param entraClientId = empty('#{ENTRA_CLIENT_ID}#') ? null : '#{ENTRA_CLIENT_ID}#
 param entraClientSecret = empty('#{ENTRA_CLIENT_SECRET}#') ? null : '#{ENTRA_CLIENT_SECRET}#'
 
 param addRoleAssignments = empty('#{addRoleAssignments}#') ? false : toLower('#{addRoleAssignments}#') == 'true'
-param createDnsZones = true
-param publicAccessEnabled = false
-param makeWebAppsPublic = empty('#{makeWebAppsPublic}#') ? false : toLower('#{makeWebAppsPublic}#') == 'true'
-
-param admin_username = empty('#{ADMIN_USERNAME}#') ? null : '#{ADMIN_USERNAME}#' // This is the username for the admin user of jumpboxvm
-param admin_password = empty('#{ADMIN_PASSWORD}#') ? null : '#{ADMIN_PASSWORD}#' // This is the password for the admin user of jumpboxvm
-param vm_name = empty('#{VM_NAME}#') ? null : '#{VM_NAME}#' // optional Jumpbox VM name - otherwise created by resourceNames.bicep
-param myIpAddress = empty('#{MY_IP_ADDRESS}#') ? null : '#{MY_IP_ADDRESS}#'
+param publicAccessEnabled = true
+param makeWebAppsPublic = true
 
 param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') == 'true'
-// Should we deploy the API Management service?
-param deployAPIApp = empty('#{deployAPI}#') ? false : toLower('#{deployAPI}#') == 'true'
-// Should we deploy the API app?
-param deployUIApp = empty('#{deployUI}#') ? false : toLower('#{deployUI}#') == 'true'
-// Should we deploy the UI app?
-param vnetPrefix = empty('#{VNET_PREFIX}#') ? null : '#{VNET_PREFIX}#'
-
-// applications
-param apiImageName = empty('#{API_IMAGE_NAME}#') ? null : '#{API_IMAGE_NAME}#'
+param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
 
 // only for Microsoft internal deployments

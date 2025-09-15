@@ -8,11 +8,11 @@ param vm_computer_name string = vm_name
 param location string = resourceGroup().location
 
 @description('Admin username for the VM')
-param admin_username string
+param vm_username string
 
 @secure()
 @description('Admin password for the VM')
-param admin_password string
+param vm_password string
 
 @description('Virtual Network resource ID')
 param vnet_id string
@@ -171,8 +171,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     }
     osProfile: {
       computerName: vm_computer_name
-      adminUsername: admin_username
-      adminPassword: admin_password
+      adminUsername: vm_username
+      adminPassword: vm_password
       windowsConfiguration: os_type == 'Windows' ? {
         enableAutomaticUpdates: true
         patchSettings: {

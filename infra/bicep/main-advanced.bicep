@@ -59,40 +59,38 @@ param existingVnetName string = ''
 @description('If you provide an existing VNET what resource group is it in?')
 param existingVnetResourceGroupName string = ''
 @description('If you provide this is will be used instead of creating a new VNET')
-param vnetPrefix string = '10.183.4.0/22'
+param vnetPrefix string = '172.16.4.0/22'                         // '172.16.4.0/22'   -or- '10.183.4.0/22'
 param subnetAppGwName string = ''
-param subnetAppGwPrefix string = cidrSubnet(vnetPrefix, 24, 1) // '10.183.5.0/24'
+param subnetAppGwPrefix string = cidrSubnet(vnetPrefix, 24, 1)    // '172.16.5.0/24'   -or- '10.183.5.0/24'
 param subnetAppSeName string = ''
-param subnetAppSePrefix string = cidrSubnet(vnetPrefix, 24, 0) // 10.183.4.0/24
+param subnetAppSePrefix string = cidrSubnet(vnetPrefix, 24, 0)    // '172.16.4.0/24'   -or- '10.183.4.0/24'
 param subnetPeName string = ''
-param subnetPePrefix string = cidrSubnet(vnetPrefix, 27, 16) // 10.183.6.0/27
+param subnetPePrefix string = cidrSubnet(vnetPrefix, 27, 16)      // '172.16.6.0/27'   -or- '10.183.6.0/27'
 param subnetAgentName string = ''
-param subnetAgentPrefix string = cidrSubnet(vnetPrefix, 27, 17) // 10.183.6.32/27
+param subnetAgentPrefix string = cidrSubnet(vnetPrefix, 27, 17)   // '172.16.6.32/27'  -or- '10.183.6.32/27'
 param subnetBastionName string = '' // This is the default for the MFG AI LZ, it can be changed to fit your needs
-param subnetBastionPrefix string = cidrSubnet(vnetPrefix, 26, 9) // 10.183.6.64/26
+param subnetBastionPrefix string = cidrSubnet(vnetPrefix, 26, 9)  // '172.16.6.64/26'  -or- '10.183.6.64/26'
 param subnetJumpboxName string = '' // This is the default for the MFG AI LZ, it can be changed to fit your needs
-param subnetJumpboxPrefix string = cidrSubnet(vnetPrefix, 28, 40) // 10.183.6.128/28
+param subnetJumpboxPrefix string = cidrSubnet(vnetPrefix, 28, 40) // '172.16.6.128/28' -or- '10.183.6.128/28'
 param subnetTrainingName string = ''
-param subnetTrainingPrefix string = cidrSubnet(vnetPrefix, 25, 6) // 10.183.7.0/25
+param subnetTrainingPrefix string = cidrSubnet(vnetPrefix, 25, 6) // '172.16.7.0/25'   -or- '10.183.7.0/25'
 param subnetScoringName string = ''
-param subnetScoringPrefix string = cidrSubnet(vnetPrefix, 25, 7) // 10.183.7.128/25
+param subnetScoringPrefix string = cidrSubnet(vnetPrefix, 25, 7)  // '172.16.7.128/25' -or- '10.183.7.128/25'
 
 // --------------------------------------------------------------------------------------------------------------
 // Virtual machine jumpbox
 // --------------------------------------------------------------------------------------------------------------
 @description('Admin username for the VM (optional - only deploy VM if provided)')
-param admin_username string?
+param vm_username string?
 @secure()
 @description('Admin password for the VM (optional - only deploy VM if provided)')
-param admin_password string?
+param vm_password string?
 @description('VM name (optional - will use generated name if not provided)')
 param vm_name string?
 
 // --------------------------------------------------------------------------------------------------------------
 // Container App Environment
 // --------------------------------------------------------------------------------------------------------------
-@description('Name of the Container Apps Environment workload profile to use for the app')
-param appContainerAppEnvironmentWorkloadProfileName string = containerAppEnvironmentWorkloadProfiles[0].name
 @description('Workload profiles for the Container Apps environment')
 param containerAppEnvironmentWorkloadProfiles array = [
   {
@@ -102,6 +100,8 @@ param containerAppEnvironmentWorkloadProfiles array = [
     maximumCount: 10
   }
 ]
+@description('Name of the Container Apps Environment workload profile to use for the app')
+param appContainerAppEnvironmentWorkloadProfileName string = containerAppEnvironmentWorkloadProfiles[0].name
 
 // --------------------------------------------------------------------------------------------------------------
 // Container App Entra Parameters
@@ -232,7 +232,6 @@ param runDateTime string = utcNow()
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
 param businessOwnerTag string = 'UNKNOWN'
-param requestorNameTag string = 'UNKNOWN'
 param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
 param costCenterTag string = 'UNKNOWN'
@@ -253,7 +252,6 @@ var tags = {
   'created-by': createdByTag
   'application-name': applicationName
   'environment-name': environmentName
-  'requestor-name': requestorNameTag
   'application-owner': applicationOwnerTag
   'business-owner': businessOwnerTag
   'cost-center': costCenterTag
@@ -267,7 +265,7 @@ var deployEntraClientSecrets = !(empty(entraClientId) || empty(entraClientSecret
 
 var deployContainerRegistry = deployAPIApp || deployUIApp
 var deployCAEnvironment = deployAPIApp || deployUIApp
-var deployVirtualMachine = !empty(admin_username) && !empty(admin_password)
+var deployVirtualMachine = !empty(vm_username) && !empty(vm_password)
 
 // --------------------------------------------------------------------------------------------------------------
 // -- Generate Resource Names -----------------------------------------------------------------------------------
@@ -322,8 +320,8 @@ module virtualMachine './modules/virtualMachine/virtualMachine.bicep' = if (depl
   name: 'jumpboxVirtualMachineDeployment'
   params: {
     // Required parameters
-    admin_username: admin_username!
-    admin_password: admin_password!
+    vm_username: vm_username!
+    vm_password: vm_password!
     vnet_id: vnet.outputs.vnetResourceId
     vm_name: !empty(vm_name) ? vm_name! : resourceNames.outputs.vm.name
     vm_computer_name: resourceNames.outputs.vm.name_15
@@ -473,8 +471,8 @@ module apiKeySecret './modules/security/keyvault-secret.bicep' = {
   }
 }
 
-module apimSecret './modules/security/keyvault-secret.bicep' = {
-  name: 'apim-search${deploymentSuffix}'
+module apimSecret './modules/security/keyvault-secret.bicep' = if (deployAPIM) {
+  name: 'secret-apim${deploymentSuffix}'
   params: {
     keyVaultName: keyVault.outputs.name
     secretName: 'apimkey'
@@ -485,7 +483,7 @@ module apimSecret './modules/security/keyvault-secret.bicep' = {
 }
 
 module entraClientIdSecret './modules/security/keyvault-secret.bicep' = if (deployEntraClientSecrets) {
-  name: 'entraClientId-search${deploymentSuffix}'
+  name: 'secret-entraClientId${deploymentSuffix}'
   params: {
     keyVaultName: keyVault.outputs.name
     secretName: 'entraclientid'
@@ -494,7 +492,7 @@ module entraClientIdSecret './modules/security/keyvault-secret.bicep' = if (depl
   }
 }
 module entraClientSecretSecret './modules/security/keyvault-secret.bicep' = if (deployEntraClientSecrets) {
-  name: 'entraClientSecret-search${deploymentSuffix}'
+  name: 'secret-entraClientSecret${deploymentSuffix}'
   params: {
     keyVaultName: keyVault.outputs.name
     secretName: 'entraclientsecret'
@@ -1068,13 +1066,13 @@ var apiSettings = [
   { name: 'AZURE_SDK_TRACING_IMPLEMENTATION', value: 'opentelemetry' }
   { name: 'AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED', value: 'true' }
 
-  { name: 'APIM_BASE_URL', value: apimBaseUrl }
-  { name: 'APIM_ACCESS_URL', value: apimAccessUrl }
-  { name: 'APIM_KEY', secretRef: 'apimkey' }
   { name: 'MOCK_USER_UPN', value: string(mockUserUpn) }
 ]
 var apimSettings = deployAPIM
   ? [
+  { name: 'APIM_BASE_URL', value: apimBaseUrl }
+  { name: 'APIM_ACCESS_URL', value: apimAccessUrl }
+  { name: 'APIM_KEY', secretRef: 'apimkey' }
   { name: 'API_MANAGEMENT_NAME', value: apim!.outputs.name }
   { name: 'API_MANAGEMENT_ID', value: apim!.outputs.id }
   { name: 'API_MANAGEMENT_ENDPOINT', value: apim!.outputs.gatewayUrl }

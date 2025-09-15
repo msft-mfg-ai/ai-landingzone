@@ -49,10 +49,10 @@ param createDnsZones bool = true
 // Virtual machine jumpbox
 // --------------------------------------------------------------------------------------------------------------
 @description('Admin username for the VM (optional - only deploy VM if provided)')
-param admin_username string?
+param vm_username string?
 @secure()
 @description('Admin password for the VM (optional - only deploy VM if provided)')
-param admin_password string?
+param vm_password string?
 @description('VM name (optional - will use generated name if not provided)')
 param vm_name string?
 
@@ -80,7 +80,6 @@ param runDateTime string = utcNow()
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
 param businessOwnerTag string = 'UNKNOWN'
-param requestorNameTag string = 'UNKNOWN'
 param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
 param costCenterTag string = 'UNKNOWN'
@@ -96,13 +95,12 @@ var tags = {
   'creation-date': take(runDateTime, 8)
   'created-by': createdByTag
   'environment-name': environmentName
-  'requestor-name': requestorNameTag
   'application-owner': applicationOwnerTag
   'business-owner': businessOwnerTag
   'cost-center': costCenterTag
 }
 
-var deployVirtualMachine = !empty(admin_username) && !empty(admin_password)
+var deployVirtualMachine = !empty(vm_username) && !empty(vm_password)
 
 // --------------------------------------------------------------------------------------------------------------
 // -- Resource Groups -------------------------------------------------------------------------------------------
@@ -188,8 +186,8 @@ module virtualMachine './modules/virtualMachine/virtualMachine.bicep' = if (depl
   scope: projectResourceGroup
   params: {
     // Required parameters
-    admin_username: admin_username!
-    admin_password: admin_password!
+    vm_username: vm_username!
+    vm_password: vm_password!
     vnet_id: existingVirtualNetwork.outputs.vnetResourceId
     vm_name: vm_name_internal
     vm_computer_name: resourceNames.outputs.project_vm.vm_name_15

@@ -8,11 +8,10 @@
 //   USER_PRINCIPAL_ID   - GH Environment Secret - User Principal ID - this is you - BYO User
 //   INSTANCE_NUMBER     - GH Environment Variable
 //   OWNER_EMAIL         - GH Environment Variable - optional
-//   runBuildDeployAPI    - Runtime  - User decision to deploy webapp or not
 //   environmentName     - Runtime  - Environment Code (e.g., dev, qa, prod)
 // --------------------------------------------------------------------------------
 
-using './main-basic.bicep'
+using './main-advanced.bicep'
 
 param applicationName = '#{APP_NAME}#'
 param environmentName = '#{ENVIRONMENT_CODE}#'
@@ -21,7 +20,6 @@ param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
 
 param businessOwnerTag  = '#{BUSINESS_OWNER}#'
-param requestorNameTag  = '#{REQUESTOR_NAME}#'
 param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
 param costCenterTag  = '#{COST_CENTER}#'
 
@@ -42,18 +40,22 @@ param entraClientId = empty('#{ENTRA_CLIENT_ID}#') ? null : '#{ENTRA_CLIENT_ID}#
 param entraClientSecret = empty('#{ENTRA_CLIENT_SECRET}#') ? null : '#{ENTRA_CLIENT_SECRET}#'
 
 param addRoleAssignments = empty('#{addRoleAssignments}#') ? false : toLower('#{addRoleAssignments}#') == 'true'
-param publicAccessEnabled = true
-param makeWebAppsPublic = true
+param createDnsZones = true
+param publicAccessEnabled = false
+param makeWebAppsPublic = empty('#{makeWebAppsPublic}#') ? false : toLower('#{makeWebAppsPublic}#') == 'true'
+
+param vm_username = empty('#{VM_USERNAME}#') ? null : '#{VM_USERNAME}#' // This is the username for the admin user of jumpboxvm
+param vm_password = empty('#{VM_PASSWORD}#') ? null : '#{VM_PASSWORD}#' // This is the password for the admin user of jumpboxvm
+param vm_name = empty('#{VM_NAME}#') ? null : '#{VM_NAME}#' // optional Jumpbox VM name - otherwise created by resourceNames.bicep
+param myIpAddress = empty('#{MY_IP_ADDRESS}#') ? null : '#{MY_IP_ADDRESS}#'
 
 param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') == 'true'
 // Should we deploy the API Management service?
-param deployAPIApp = empty('#{deployAPI}#') ? false : toLower('#{deployAPI}#') == 'true'
-// Should we deploy the API app?
-param deployUIApp = empty('#{deployUI}#') ? false : toLower('#{deployUI}#') == 'true'
+param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
 // Should we deploy the UI app?
+param vnetPrefix = empty('#{VNET_PREFIX}#') ? null : '#{VNET_PREFIX}#'
 
 // applications
-param apiImageName = empty('#{API_IMAGE_NAME}#') ? null : '#{API_IMAGE_NAME}#'
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
 
 // only for Microsoft internal deployments
