@@ -65,7 +65,7 @@ jobs:
             echo "##vso[task.setvariable variable=caAppName]$caAppName"
             $imageName="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.BuildId)"
             echo "##vso[task.setvariable variable=imageName]$imageName"
-            $acrName='cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)'
+            $acrName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
             echo "##vso[task.setvariable variable=acrName]$acrName"
 
             echo "environmentCodeLower=$environmentCodeLower"
