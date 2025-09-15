@@ -84,13 +84,6 @@ jobs:
       UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
       UI_PORT: ${{ env.UI_PORT }}
 
-      USER_ASSIGNED_IDENTITY_ID: 'id-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
-
-      # API_CONTAINER_APP_NAME: 'ca-api-${{ vars.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
-      # API_APP_PATH: ${{ env.API_APP_PATH }}
-      # API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}
-      # API_PORT: ${{ env.API_PORT }}
-
     steps:
       - name: Set common environment variables
         id: set-env
@@ -193,4 +186,3 @@ jobs:
       CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
       PORT: ${{ needs.template-env.outputs.UI_PORT }}
       IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
-      USER_ASSIGNED_IDENTITY_ID: ${{ needs.template-env.outputs.USER_ASSIGNED_IDENTITY_ID }}

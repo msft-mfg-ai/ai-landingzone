@@ -1,5 +1,6 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # Reusable Workflow: Create a Container App
+# NOTE: This needs a variable USER_ASSIGNED_IDENTITY_ID with the ID of the managed identity that can update the ACR
 # ------------------------------------------------------------------------------------------------------------------------
 name: z_template_create_container_app
 run-name: Create Container App
@@ -25,9 +26,6 @@ on:
         required: true
         type: string
       PORT:
-        required: true
-        type: string
-      USER_ASSIGNED_IDENTITY_ID:
         required: true
         type: string
 
@@ -88,8 +86,8 @@ jobs:
             --min-replicas 1 \
             --max-replicas 1 \
             --ingress external \
-            --user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
-            --registry-identity "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
+            --user-assigned "${{ var.USER_ASSIGNED_IDENTITY_ID }}" \
+            --registry-identity "${{ var.USER_ASSIGNED_IDENTITY_ID }}" \
             --registry-server "${{ inputs.ACR_NAME }}.azurecr.io" \
             --container-name app
 
