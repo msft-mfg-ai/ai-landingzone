@@ -29,7 +29,7 @@ builder.Services.AddSingleton((provider) =>
             ExcludeManagedIdentityCredential = true,
             TenantId = vsTenantId
         });
-    PersistentAgentsClient client = new(config.AIProjectEndpoint, credential);
+    PersistentAgentsClient client = new(config.AppAgentEndpoint, credential);
 
     return client;
 });
