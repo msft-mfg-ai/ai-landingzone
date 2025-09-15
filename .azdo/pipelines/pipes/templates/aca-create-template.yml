@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------------------------------
-# Template to deploy a Docker image to a Container App
+# Template to create a Container App and deploy a Docker image to it
 # ----------------------------------------------------------------------------------------------------
 # This template gets the appName from the variable group: AI.LZ.Secrets
 #   and the resource group name from /vars/var-<env>.yml
@@ -68,6 +68,13 @@ jobs:
             $acrName='cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)'
             echo "##vso[task.setvariable variable=acrName]$acrName"
 
+            $containerRegistryUrl="$acrName.azurecr.io"
+            echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
+            $userAssignedIdentityId="id-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=userAssignedIdentityId]$userAssignedIdentityId"
+            $containerAppEnvName="cae-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=containerAppEnvName]$containerAppEnvName"
+
             echo "environmentCodeLower=$environmentCodeLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"
             echo "resourceGroupName=$resourceGroupName"
@@ -78,6 +85,9 @@ jobs:
             echo "containerRegistryUrl=$containerRegistryUrl"
             echo "imageName=$imageName"
             echo "acrName=$acrName"
+            echo "containerRegistryUrl=$containerRegistryUrl"
+            echo "userAssignedIdentityId=$userAssignedIdentityId"
+            echo "containerAppEnvName=$containerAppEnvName"
 
             echo "----------------------------------------"
             echo "##[group]Display All Environment Variables:"
@@ -94,9 +104,18 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az containerapp update \
+            az containerapp create \
               --name $(caAppName) \
               --resource-group $(resourceGroupName) \
+              --environment $(containerAppEnvName) \
               --image $(containerRegistryUrl)/$(imageName) \
+              --target-port $(port) \
+              --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" \
+              --cpu 0.5 \
+              --memory 1.0 \
+              --min-replicas 1 \
+              --max-replicas 1 \
+              --ingress external \
+              --user-assigned "$(userAssignedIdentityId)" \
+              --registry-server "$(acrName).azurecr.io" \
               --container-name app
-

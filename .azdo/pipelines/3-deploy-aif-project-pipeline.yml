@@ -56,11 +56,6 @@ parameters:
     type: boolean
     default: false
 
-  # - name: runGHASScan
-  #   displayName: Run GHAS Scan?
-  #   type: boolean
-  #   default: false
-
 # ----------------------------------------------------------------------------------------------------
 variables:
   - group: AI.LZ.Secrets
@@ -80,7 +75,6 @@ stages:
           appsToDeploy: 'none'
           addRoleAssignments: 'true'
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
-          runGHASScan: false
 
   - ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
       - template: pipes/infra-only-pipe.yml
@@ -93,4 +87,3 @@ stages:
           appsToDeploy: 'none'
           addRoleAssignments: 'true'
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
-          runGHASScan: false
