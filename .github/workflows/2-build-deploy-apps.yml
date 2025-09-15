@@ -54,7 +54,6 @@ permissions:
 env:
   # these are defined by the project itself, so they can stay here...
   ACR_REPO_NAME: 'aiapps'
-
   UI_APP_PATH: 'src/website/chatui'
   UI_ACR_APP_NAME: 'chatui'
   UI_PORT: '8001'
@@ -71,14 +70,12 @@ jobs:
       ENV_CODE: ${{ inputs.deployEnvironment }}
       APP_NAME: ${{ vars.APP_NAME }}
       APP_NAME_NO_DASHES: ${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}
-
       RESOURCEGROUPNAME: ${{ steps.set-env.outputs.RESOURCEGROUPNAME }}
+      USER_ASSIGNED_IDENTITY_ID: 'id-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
 
       ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
-
       CONTAINER_APP_ENV_NAME: 'cae-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
-
       UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
       UI_APP_PATH: ${{ env.UI_APP_PATH }}
       UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
@@ -186,3 +183,4 @@ jobs:
       CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
       PORT: ${{ needs.template-env.outputs.UI_PORT }}
       IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
+      USER_ASSIGNED_IDENTITY_ID: ${{ needs.template-env.outputs.USER_ASSIGNED_IDENTITY_ID }}
