@@ -30,8 +30,7 @@ on:
        
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
-  create-container-app:
-    name: Create Container App
+  create:
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.ENV_CODE }}
