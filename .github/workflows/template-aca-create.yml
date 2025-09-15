@@ -80,7 +80,7 @@ jobs:
             --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} \
             --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} \
             --target-port ${{ inputs.PORT }} \
-            --env-vars AIProjectEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" AIAgentId="${{ vars.APP_AGENT_ID }}" \
+            --env-vars AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" AppAgentId="${{ vars.APP_AGENT_ID }}" \
             --cpu 0.5 \
             --memory 1.0 \
             --min-replicas 1 \
