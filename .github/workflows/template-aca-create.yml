@@ -27,7 +27,10 @@ on:
       PORT:
         required: true
         type: string
-       
+      USER_ASSIGNED_IDENTITY_ID:
+        required: true
+        type: string
+
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
   create:
@@ -77,7 +80,6 @@ jobs:
             --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} \
             --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} \
             --target-port ${{ inputs.PORT }} \
-            --secrets entraclientid="${{ secrets.ENTRA_CLIENT_ID }}" entraclientsecret="${{ secrets.ENTRA_CLIENT_SECRET }}" \
             --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
             AIProjectEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
             AIAgentId="${{ vars.APP_AGENT_ID }}" \
@@ -86,7 +88,10 @@ jobs:
             --min-replicas 1 \
             --max-replicas 1 \
             --ingress external \
-            --user-assigned "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-            --registry-identity "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
+            --user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
+            --registry-identity "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
             --registry-server "${{ inputs.ACR_NAME }}.azurecr.io" \
             --container-name app
+
+# Put this right above the "--env-vars" line if needed
+# --secrets entraclientid="$ { { secrets.ENTRA_CLIENT_ID }}" entraclientsecret="$ { { secrets.ENTRA_CLIENT_SECRET }}" \
