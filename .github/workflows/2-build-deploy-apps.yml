@@ -94,14 +94,14 @@ jobs:
       ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
 
-      CONTAINER_APP_ENV_NAME: 'cae-${{ steps.set-env.outputs.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      CONTAINER_APP_ENV_NAME: 'cae-${{ vars.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
 
-      UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
+      UI_CONTAINER_APP_NAME: 'ca-ui-${{ vars.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
       UI_APP_PATH: ${{ env.UI_APP_PATH }}
       UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
       UI_PORT: ${{ env.UI_PORT }}
 
-      # API_CONTAINER_APP_NAME: 'ca-api-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
+      # API_CONTAINER_APP_NAME: 'ca-api-${{ vars.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
       # API_APP_PATH: ${{ env.API_APP_PATH }}
       # API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}
       # API_PORT: ${{ env.API_PORT }}
