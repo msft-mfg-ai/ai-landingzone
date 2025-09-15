@@ -24,14 +24,14 @@ parameters:
     - build-deploy
     - create-build-deploy
     - none
-- name: runMSDevSecOpsScan
-  displayName: Run Scan
-  type: boolean
-  default: false
-
+  default: 'build-deploy'
 - name: updateACRFirewall
   displayName: Update ACR Firewall
   type: boolean 
+  default: false
+- name: runMSDevSecOpsScan
+  displayName: Run Scan
+  type: boolean
   default: false
 
 # ----------------------------------------------------------------------------------------------------
