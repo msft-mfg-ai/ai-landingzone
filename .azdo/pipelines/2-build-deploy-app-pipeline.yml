@@ -59,28 +59,3 @@ stages:
     apps: [ 
       { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
     ] 
-
-
-# # ----------------------------------------------------------------------------------------------------
-# - template: pipes/aca-build-one-pipe.yml
-#   parameters:
-#     pushToACR: ${{ parameters.pushApps }}
-#     apps: [ 
-#       { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
-#     ] 
-
-# # ----------------------------------------------------------------------------------------------------
-# - ${{ if lower(parameters.deployAction) == 'build-deploy' }}:
-#   - template: pipes/aca-deploy-pipe.yml
-#     parameters:
-#       apps: [ 
-#         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
-#       ] 
-
-# # ----------------------------------------------------------------------------------------------------
-# - ${{ if lower(parameters.deployAction) == 'create-build-deploy' }}:
-#   - template: pipes/aca-create-pipe.yml
-#     parameters:
-#       apps: [ 
-#         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
-#       ] 

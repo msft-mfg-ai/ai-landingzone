@@ -45,10 +45,6 @@ jobs:
       # ----------------------------------------------------------------------------------------------------
       # Set up the environment variables
       # ----------------------------------------------------------------------------------------------------
-            x--environment ${{ inputs.CONTAINER_APP_ENV_NAME }} \
-            x--user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
-            x--registry-server "${{ inputs.ACR_NAME }}.azurecr.io" \
-
       - task: PowerShell@2
         name: createVariables
         displayName: Create Variables
@@ -113,7 +109,7 @@ jobs:
             --name $(caAppName) \
             --resource-group $(resourceGroupName) \
             --environment $(containerAppEnvName) \
-            --image $(containerRegistryUrl)/$(imageName)
+              --image $(containerRegistryUrl)/$(imageName) \
             --target-port $(port) \
             --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" \
             --cpu 0.5 \
