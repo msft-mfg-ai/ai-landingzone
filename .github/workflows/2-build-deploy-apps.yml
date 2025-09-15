@@ -77,9 +77,9 @@ jobs:
       ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
 
-      CONTAINER_APP_ENV_NAME: 'cae-${{ vars.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      CONTAINER_APP_ENV_NAME: 'cae-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
 
-      UI_CONTAINER_APP_NAME: 'ca-ui-${{ vars.APP_NAME }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
       UI_APP_PATH: ${{ env.UI_APP_PATH }}
       UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
       UI_PORT: ${{ env.UI_PORT }}
@@ -157,7 +157,7 @@ jobs:
       ACR_APP_NAME: ${{ needs.template-env.outputs.UI_ACR_APP_NAME }}
 
   # ------------------------------------------------------------------------------------------------------------------------
-  deploy-ui:
+  deploy-existing-ui:
     name: Deploy UI to ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-aca-deploy.yml
     if: ${{ inputs.deployAction == 'build-deploy' }}
@@ -175,7 +175,7 @@ jobs:
       IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
 
   # ------------------------------------------------------------------------------------------------------------------------
-  create-ui:
+  create-deploy-ui:
     name: Create Container App in ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-aca-create.yml
     if: ${{ inputs.deployAction == 'create-build-deploy' }}
@@ -191,44 +191,3 @@ jobs:
       CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
       PORT: ${{ needs.template-env.outputs.UI_PORT }}
       IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
-
-    # name: Create UI Container App
-    # runs-on: ubuntu-latest
-    # environment: ${{ inputs.deployEnvironment }}
-    # if: ${{ inputs.deployAction == 'create-build-deploy' }}
-    # needs:
-    #   - template-env
-    #   - build-ui
-    # steps:
-    #   - uses: actions/checkout@v4
-
-    #   - name: Azure Login (Reusable Action)
-    #     uses: ./.github/actions/login-action
-    #     with:
-    #       client-id: ${{ secrets.CICD_CLIENT_ID }}
-    #       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    #       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    #       client-secret: ${{ secrets.CICD_CLIENT_SECRET }}
-
-    #   - name: Create UI Container App
-    #     run: |
-    #       echo "Creating UI Container App..."
-    #       az containerapp create \
-    #         --name ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }} \
-    #         --resource-group ${{ needs.template-env.outputs.RESOURCEGROUPNAME }} \
-    #         --environment ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }} \
-    #         --image ${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io/${{ needs.build-ui.outputs.IMAGE_NAME }} \
-    #         --target-port ${{ needs.template-env.outputs.UI_PORT }} \
-    #         --secrets entraclientid="${{ secrets.ENTRA_CLIENT_ID }}" entraclientsecret="${{ secrets.ENTRA_CLIENT_SECRET }}" \
-    #         --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
-    #         AIProjectEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
-    #         AIAgentId="${{ vars.APP_AGENT_ID }}" \
-    #         --cpu 0.5 \
-    #         --memory 1.0 \
-    #         --min-replicas 1 \
-    #         --max-replicas 1 \
-    #         --ingress external \
-    #         --user-assigned "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-    #         --registry-identity "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-    #         --registry-server "${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io" \
-    #         --container-name app
