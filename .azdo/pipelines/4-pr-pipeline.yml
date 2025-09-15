@@ -29,9 +29,10 @@ stages:
           runMSDevSecOpsScan: true
           runGHASScan: false
 
-  - template: pipes/aca-build-one-pipe.yml
+  - template: pipes/build-deploy-app-pipe.yml
     parameters:
       pushToACR: false
+      deployAction: 'build-only'
       apps: [ 
         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
       ] 

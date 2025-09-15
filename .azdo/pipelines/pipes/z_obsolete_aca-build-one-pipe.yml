@@ -19,7 +19,7 @@ stages:
     - stage: Build${{ app.containerAppName }}${{ environmentCode }}Service
       displayName: Build ${{ app.containerAppName }} ${{ environmentCode }}
       jobs:
-        - template: templates/aca-build-one-template.yml
+        - template: templates/aca-build-template.yml
           parameters:
             serviceConnectionName: $(serviceConnectionName)
             acrAppName: ${{ app.acrAppName }}
