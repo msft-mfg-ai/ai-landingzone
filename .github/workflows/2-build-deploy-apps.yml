@@ -68,11 +68,11 @@ env:
   # these are defined by the project itself, so they can stay here...
   ACR_REPO_NAME: 'aiapps'
 
-  API_APP_PATH: ''
-  API_ACR_APP_NAME: 'chatapi'
-  API_PORT: '8000'
+  # API_APP_PATH: ''
+  # API_ACR_APP_NAME: 'chatapi'
+  # API_PORT: '8000'
 
-  UI_APP_PATH: 'ui/gradio_ui'
+  UI_APP_PATH: 'src/website/chatui'
   UI_ACR_APP_NAME: 'chatui'
   UI_PORT: '8001'
 
@@ -96,10 +96,10 @@ jobs:
 
       CONTAINER_APP_ENV_NAME: '${{ steps.set-env.outputs.CONTAINER_APP_ENV_NAME }}'
 
-      API_CONTAINER_APP_NAME: 'ca-api-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
-      API_APP_PATH: ${{ env.API_APP_PATH }}
-      API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}
-      API_PORT: ${{ env.API_PORT }}
+      # API_CONTAINER_APP_NAME: 'ca-api-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
+      # API_APP_PATH: ${{ env.API_APP_PATH }}
+      # API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}
+      # API_PORT: ${{ env.API_PORT }}
 
       UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
       UI_APP_PATH: ${{ env.UI_APP_PATH }}
@@ -142,14 +142,13 @@ jobs:
           echo "ACR_NAME: $ACR_NAME"
           echo "CONTAINER_APP_ENV_NAME: $CONTAINER_APP_ENV_NAME"
 
-          echo "API_APP_PATH: ${{ env.API_APP_PATH }}"
-          echo "API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}"
-          echo "API_PORT: ${{ env.API_PORT }}"
-
           echo "UI_APP_PATH: ${{ env.UI_APP_PATH }}"
           echo "UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}"
           echo "UI_PORT: ${{ env.UI_PORT }}"
 
+        # echo "API_APP_PATH: ${{ env.API_APP_PATH }}"
+        # echo "API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}"
+        # echo "API_PORT: ${{ env.API_PORT }}"
   # ------------------------------------------------------------------------------------------------------------------------
   scan-code:
     name: Scan Source Code
@@ -320,16 +319,8 @@ jobs:
             --target-port ${{ needs.template-env.outputs.UI_PORT }} \
             --secrets entraclientid="${{ secrets.ENTRA_CLIENT_ID }}" entraclientsecret="${{ secrets.ENTRA_CLIENT_SECRET }}" \
             --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
-            COSMOS_DB_ENDPOINT="${{ vars.COSMOS_DB_ENDPOINT }}" \
-            COSMOS_DB_SESSIONS_DATABASE_NAME="sessions" \
-            COSMOS_DB_SESSIONS_CONTAINER_NAME="uisessions" \
-            ENTRA_CLIENT_ID=secretref:entraclientid \
-            ENTRA_CLIENT_SECRET=secretref:entraclientsecret \
-            ENTRA_TENANT_ID="${{ vars.ENTRA_TENANT_ID }}" \
-            ENTRA_SCOPES="${{ vars.ENTRA_SCOPES }}" \
-            ENTRA_REDIRECT_URI="${{ vars.ENTRA_REDIRECT_URI }}" \
-            API_URL="${{ vars.API_URL}}" \
-            AZURE_CLIENT_ID="${{ vars.USER_ASSIGNED_IDENTITY_CLIENT_ID }}" \
+            AIProjectEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
+            AIAgentId="${{ vars.APP_AGENT_ID }}" \
             --cpu 0.5 \
             --memory 1.0 \
             --min-replicas 1 \
@@ -339,3 +330,15 @@ jobs:
             --registry-identity "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
             --registry-server "${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io" \
             --container-name app
+
+
+  # COSMOS_DB_ENDPOINT="${{ vars.COSMOS_DB_ENDPOINT }}" \
+        # COSMOS_DB_SESSIONS_DATABASE_NAME="sessions" \
+        # COSMOS_DB_SESSIONS_CONTAINER_NAME="uisessions" \
+        # ENTRA_CLIENT_ID=secretref:entraclientid \
+        # ENTRA_CLIENT_SECRET=secretref:entraclientsecret \
+        # ENTRA_TENANT_ID="${{ vars.ENTRA_TENANT_ID }}" \
+        # ENTRA_SCOPES="${{ vars.ENTRA_SCOPES }}" \
+        # ENTRA_REDIRECT_URI="${{ vars.ENTRA_REDIRECT_URI }}" \
+        # AZURE_CLIENT_ID="${{ vars.USER_ASSIGNED_IDENTITY_CLIENT_ID }}" \
+        # API_URL="${{ vars.API_URL}}" \
