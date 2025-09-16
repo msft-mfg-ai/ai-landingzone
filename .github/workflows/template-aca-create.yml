@@ -86,8 +86,8 @@ jobs:
             --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} \
             --target-port ${{ inputs.PORT }} \
             --env-vars \
-              AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
-              AppAgentId="${{ vars.APP_AGENT_ID }}" \
+              AppSettings__AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
+              AppSettings__AppAgentId="${{ vars.APP_AGENT_ID }}" \
               APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" \
               AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
               AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \

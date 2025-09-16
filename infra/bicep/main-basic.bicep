@@ -608,8 +608,8 @@ module managedEnvironment './modules/app/managedEnvironment.bicep' = if (deployC
 var containerAppSettings = [
   { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: logAnalytics.outputs.appInsightsConnectionString }
 
-  { name: 'AppAgentEndpoint', value: aiProject.outputs.aiConnectionUrl }
-  { name: 'AppAgentId', value: 'TBD' }
+  { name: 'AppSettings__AppAgentEndpoint', value: aiProject.outputs.aiConnectionUrl }
+  { name: 'AppSettings__AppAgentId', value: 'TBD' }
 
   { name: 'AZURE_CLIENT_ID', value: identity.outputs.managedIdentityClientId }
   { name: 'AZURE_SDK_TRACING_IMPLEMENTATION', value: 'opentelemetry' }

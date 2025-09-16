@@ -116,8 +116,8 @@ jobs:
               --image $(containerRegistryUrl)/$(imageName) \
               --target-port ${{ parameters.port }} \
               --env-vars \
-                AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" \
-                AppAgentId="$(APP_AGENT_ID)" \
+                AppSettings__AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" \
+                AppSettings__AppAgentId="$(APP_AGENT_ID)" \
                 APPLICATIONINSIGHTS_CONNECTION_STRING="$(APPINSIGHTS_CONNECTIONSTRING)" \
                 AZURE_CLIENT_ID="$(userAssignedIdentityId)" \
                 AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
