@@ -9,6 +9,15 @@ trigger: none
 
 # ----------------------------------------------------------------------------------------------------
 parameters:
+- name: deployToEnvironment
+  displayName: Deploy To
+  type: string
+  values:
+    - DEV
+    - QA
+    - PROD
+    - DEV-QA-PROD
+  default: DEV
 - name: buildApps
   displayName: Build Docker Images
   type: boolean
@@ -51,11 +60,25 @@ stages:
             runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
             runGHASScan: false
 
-- template: pipes/build-deploy-app-pipe.yml
-  parameters:
-    pushToACR: ${{ parameters.pushApps }}
-    deployAction: ${{ parameters.deployAction }}
-    updateACRFirewall: ${{ parameters.updateACRFirewall }}
-    apps: [ 
-      { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
-    ] 
+- ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - template: pipes/build-deploy-app-pipe.yml
+    parameters:
+      environments: ['${{ parameters.deployToEnvironment }}']
+      singleEnvironment: 'true'
+      pushToACR: ${{ parameters.pushApps }}
+      deployAction: ${{ parameters.deployAction }}
+      updateACRFirewall: ${{ parameters.updateACRFirewall }}
+      apps: [ 
+        { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
+      ] 
+
+- ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - template: pipes/build-deploy-app-pipe.yml
+    parameters:
+      environments: ['DEV', 'QA', 'PROD']
+      pushToACR: ${{ parameters.pushApps }}
+      deployAction: ${{ parameters.deployAction }}
+      updateACRFirewall: ${{ parameters.updateACRFirewall }}
+      apps: [ 
+        { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
+      ] 
