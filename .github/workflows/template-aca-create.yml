@@ -85,13 +85,15 @@ jobs:
             --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} \
             --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} \
             --target-port ${{ inputs.PORT }} \
-            --env-vars AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" AppAgentId="${{ vars.APP_AGENT_ID }}" \
-            APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" \
-            AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
-            AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
-            AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
-            SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
-            SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
+            --env-vars \
+              AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
+              AppAgentId="${{ vars.APP_AGENT_ID }}" \
+              APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" \
+              AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
+              AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
+              AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
+              SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
+              SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
             --cpu 0.5 \
             --memory 1.0 \
             --min-replicas 1 \
