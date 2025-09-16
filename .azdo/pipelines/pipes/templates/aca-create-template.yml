@@ -70,6 +70,8 @@ jobs:
             $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
 
+            $keyVaultName='kv$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)'
+            echo "##vso[task.setvariable variable=keyVaultName]$keyVaultName"
             $userAssignedIdentityId="id-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
             echo "##vso[task.setvariable variable=userAssignedIdentityId]$userAssignedIdentityId"
             $containerAppEnvName="cae-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
@@ -105,7 +107,7 @@ jobs:
           scriptLocation: inlineScript
           inlineScript: |
             echo "Read KV and get App Insights Connection String"
-            appInsightsConnectionString=$(az keyvault secret show --name appinsights-connectionstring --vault-name $(KEYVAULT_NAME) --query value -o tsv)
+            appInsightsConnectionString=$(az keyvault secret show --name appinsights-connectionstring --vault-name $(keyVaultName) --query value -o tsv)
 
             echo "Deploying Container App: $(caAppName) to Resource Group: $(resourceGroupName) in Environment: $(containerAppEnvName)"
             echo 'EXECUTING: az containerapp create --name $(caAppName) --resource-group $(resourceGroupName) --environment $(containerAppEnvName) --image $(containerRegistryUrl)/$(imageName) --target-port ${{ parameters.port }} --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" API_KEY="secretref:apikey" APPLICATIONINSIGHTS_CONNECTION_STRING="$appInsightsConnectionString" AZURE_CLIENT_ID="$userAssignedIdentityId" ... --user-assigned "$userAssignedIdentityId" --registry-server "$(acrName).azurecr.io" ... '

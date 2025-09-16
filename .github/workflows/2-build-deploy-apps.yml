@@ -72,6 +72,7 @@ jobs:
       APP_NAME_NO_DASHES: ${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}
       RESOURCEGROUPNAME: ${{ steps.set-env.outputs.RESOURCEGROUPNAME }}
       USER_ASSIGNED_IDENTITY_ID: 'id-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      KEY_VAULT_NAME: 'kv${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
 
       ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
@@ -110,6 +111,9 @@ jobs:
 
           CONTAINER_APP_ENV_NAME="$(echo ${{ vars.CONTAINER_APP_ENV_NAME }} | tr '[:upper:]' '[:lower:]')"
           echo "CONTAINER_APP_ENV_NAME=$CONTAINER_APP_ENV_NAME" >> $GITHUB_OUTPUT
+
+          KEY_VAULT_NAME="$(echo ${{ vars.KEY_VAULT_NAME }} | tr '[:upper:]' '[:lower:]')"
+          echo "KEY_VAULT_NAME=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
 
           echo "APP_NAME_NO_DASHES: $APP_NAME_NO_DASHES"
           echo "RESOURCEGROUPNAME: $RESOURCEGROUPNAME"
@@ -184,3 +188,4 @@ jobs:
       PORT: ${{ needs.template-env.outputs.UI_PORT }}
       IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
       USER_ASSIGNED_IDENTITY_ID: ${{ needs.template-env.outputs.USER_ASSIGNED_IDENTITY_ID }}
+      KEY_VAULT_NAME: ${{ needs.template-env.outputs.KEY_VAULT_NAME }}
