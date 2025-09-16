@@ -5,14 +5,13 @@ using chatui.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var jsonSettingsFile = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "applicationSettings.json");
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration
-  //.AddJsonFile(jsonSettingsFile)
   .AddEnvironmentVariables()
   .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
 
 builder.Services.AddOptions<ChatApiOptions>()
-    .Bind(builder.Configuration)
+    .Bind(builder.Configuration.GetSection("AppSettings"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
