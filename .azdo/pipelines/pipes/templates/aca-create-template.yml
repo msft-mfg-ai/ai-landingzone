@@ -115,7 +115,7 @@ jobs:
               --resource-group $(resourceGroupName) \
               --environment $(containerAppEnvName) \
               --image $(containerRegistryUrl)/$(imageName) \
-              --target-port $(port) \
+              --target-port ${{ parameters.port }} \
               --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" \
               API_KEY="secretref:apikey"
               APPLICATIONINSIGHTS_CONNECTION_STRING="$appInsightsConnectionString" \
@@ -124,11 +124,11 @@ jobs:
               AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
               SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
               SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
+              --user-assigned "$managedIdentityId" \
+              --registry-server "$(acrName).azurecr.io" \
               --cpu 0.5 \
               --memory 1.0 \
               --min-replicas 1 \
               --max-replicas 1 \
               --ingress external \
-              --user-assigned "$(userAssignedIdentityId)" \
-              --registry-server "$(acrName).azurecr.io" \
               --container-name app
