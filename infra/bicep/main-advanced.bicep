@@ -1057,7 +1057,6 @@ module managedEnvironment './modules/app/managedEnvironment.bicep' = if (deployC
 }
 
 var containerAppSettings = [
-  { name: 'API_KEY', secretRef: 'apikey' }
   { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: logAnalytics.outputs.appInsightsConnectionString }
 
   { name: 'AppAgentEndpoint', value: aiProject.outputs.aiConnectionUrl }
@@ -1070,6 +1069,7 @@ var containerAppSettings = [
   { name: 'SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS', value: 'true' }
   { name: 'SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE', value: 'true' }
 ]
+// { name: 'API_KEY', secretRef: 'apikey' }
 var apiUrlSettings = deployAPIApp ? [ 
   {
     name: 'API_URL'
@@ -1101,9 +1101,7 @@ var entraSecuritySettings = deployEntraClientSecrets
   { name: 'ENTRA_CLIENT_ID', secretRef: 'entraclientid' }
   { name: 'ENTRA_CLIENT_SECRET', secretRef: 'entraclientsecret' }
   ] : []
-var baseSecretSet = {
-  apikey: apiKeySecret.outputs.secretUri
-}
+var baseSecretSet = { }  // { apikey: apiKeySecret.outputs.secretUri }
 var apimSecretSet = empty(apimAccessKey)
   ? {}
   : {
