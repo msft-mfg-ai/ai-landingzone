@@ -67,9 +67,9 @@ jobs:
             echo "##vso[task.setvariable variable=imageName]$imageName"
             $acrName='cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)'
             echo "##vso[task.setvariable variable=acrName]$acrName"
-
             $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
+
             $userAssignedIdentityId="id-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
             echo "##vso[task.setvariable variable=userAssignedIdentityId]$userAssignedIdentityId"
             $containerAppEnvName="cae-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
