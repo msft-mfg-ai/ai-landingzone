@@ -104,6 +104,12 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            echo "Read KV and get App Insights Connection String"
+            appInsightsConnectionString=$(az keyvault secret show --name appinsights-connectionstring --vault-name $(KEYVAULT_NAME) --query value -o tsv)
+            echo "Read KV and get User Assigned Identity Client ID"
+            managedIdentityId=$(az keyvault secret show --name managed-identity-id --vault-name $(KEYVAULT_NAME) --query value -o tsv)
+
+            echo "Deploying Container App: $(caAppName) to Resource Group: $(resourceGroupName) in Environment: $(containerAppEnvName)"
             az containerapp create \
               --name $(caAppName) \
               --resource-group $(resourceGroupName) \
@@ -111,6 +117,13 @@ jobs:
               --image $(containerRegistryUrl)/$(imageName) \
               --target-port $(port) \
               --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" \
+              API_KEY="secretref:apikey"
+              APPLICATIONINSIGHTS_CONNECTION_STRING="$appInsightsConnectionString" \
+              AZURE_CLIENT_ID="$managedIdentityId" \
+              AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
+              AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
+              SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
+              SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
               --cpu 0.5 \
               --memory 1.0 \
               --min-replicas 1 \
