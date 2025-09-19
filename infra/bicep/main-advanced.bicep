@@ -404,6 +404,7 @@ module identity './modules/iam/identity.bicep' = {
 
 module appIdentityRoleAssignments './modules/iam/role-assignments.bicep' = if (addRoleAssignments) {
   name: 'identity-roles${deploymentSuffix}'
+  dependsOn: [cosmos]
   params: {
     identityPrincipalId: identity.outputs.managedIdentityPrincipalId
     principalType: 'ServicePrincipal'
@@ -419,6 +420,7 @@ module appIdentityRoleAssignments './modules/iam/role-assignments.bicep' = if (a
 
 module adminUserRoleAssignments './modules/iam/role-assignments.bicep' = if (addRoleAssignments && !empty(principalId)) {
   name: 'user-roles${deploymentSuffix}'
+  dependsOn: [cosmos]
   params: {
     identityPrincipalId: principalId
     principalType: 'User'
