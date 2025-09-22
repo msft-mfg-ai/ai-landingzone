@@ -14,6 +14,11 @@
 		"ghcr.io/devcontainers/features/dotnet:2": {
 			"version": "latest"
 		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "lts",
+			"nvmVersion": "latest"
+		},
 		"ghcr.io/devcontainers/features/powershell:1": {
 			"version": "latest"
 		},
@@ -30,7 +35,8 @@
 				"GitHub.copilot-chat",
 				"GitHub.copilot",
 				"ms-vscode.powershell",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"ms-azuretools.vscode-bicep"
 			]
 		}
 	}
