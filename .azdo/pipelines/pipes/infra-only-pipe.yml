@@ -5,14 +5,14 @@ parameters:
   - name: environments
     type: object
     default: ['DEV']
+  - name: singleEnvironment
+    default: 'false'
   - name: templateFolderName
     default: 'infra/bicep'
   - name: bicepVersion
     default: 'basic'
   - name: deploymentMode
     default: 'Incremental'
-  - name: singleEnvironment
-    default: 'false'
   - name: appsToDeploy
     default: 'none'
   - name: createResourceGroup

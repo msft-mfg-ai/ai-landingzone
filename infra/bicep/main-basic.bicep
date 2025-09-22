@@ -150,7 +150,6 @@ param deployUIApp bool = false
 param deployDocumentIntelligence bool = false
 
 @description('Global Region where the resources will be deployed, e.g. AM (America), EM (EMEA), AP (APAC), CH (China)')
-//@allowed(['AM', 'EM', 'AP', 'CH', 'US'])
 param regionCode string = 'US'
 
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
@@ -189,7 +188,6 @@ var tags = {
   'business-owner': businessOwnerTag
   'cost-center': costCenterTag
 }
-var commonTags = tags
 
 // Run a script to dedupe the KeyVault secrets -- this fails on private networks right now so turn if off for them
 var deduplicateKVSecrets = publicAccessEnabled ? deduplicateKeyVaultSecrets : false
@@ -271,6 +269,7 @@ module identity './modules/iam/identity.bicep' = {
 
 module appIdentityRoleAssignments './modules/iam/role-assignments.bicep' = if (addRoleAssignments) {
   name: 'identity-roles${deploymentSuffix}'
+  dependsOn: [cosmos]
   params: {
     identityPrincipalId: identity.outputs.managedIdentityPrincipalId
     principalType: 'ServicePrincipal'
@@ -286,6 +285,7 @@ module appIdentityRoleAssignments './modules/iam/role-assignments.bicep' = if (a
 
 module adminUserRoleAssignments './modules/iam/role-assignments.bicep' = if (addRoleAssignments && !empty(principalId)) {
   name: 'user-roles${deploymentSuffix}'
+  dependsOn: [cosmos]
   params: {
     identityPrincipalId: principalId
     principalType: 'User'
@@ -315,7 +315,6 @@ module keyVault './modules/security/keyvault.bicep' = {
     createUserAssignedIdentity: false
   }
 }
-
 module keyVaultSecretList './modules/security/keyvault-list-secret-names.bicep' = if (deduplicateKVSecrets) {
   name: 'keyVault-Secret-List-Names${deploymentSuffix}'
   params: {
@@ -345,6 +344,24 @@ module apimSecret './modules/security/keyvault-secret.bicep' = if (deployAPIM) {
     existingSecretNames: deduplicateKVSecrets ? keyVaultSecretList!.outputs.secretNameList : ''
   }
   dependsOn: [apim]
+}
+module appiSecret './modules/security/keyvault-secret.bicep' = if (deployAPIM) {
+  name: 'secret-appi${deploymentSuffix}'
+  params: {
+    keyVaultName: keyVault.outputs.name
+    secretName: 'appInsightsConnectingString'
+    secretValue: logAnalytics.outputs.appInsightsConnectionString
+    existingSecretNames: deduplicateKVSecrets ? keyVaultSecretList!.outputs.secretNameList : ''
+  }
+}
+module userIdSecret './modules/security/keyvault-secret.bicep' = if (deployAPIM) {
+  name: 'secret-userId${deploymentSuffix}'
+  params: {
+    keyVaultName: keyVault.outputs.name
+    secretName: 'managed-identity-id'
+    secretValue: identity.outputs.managedIdentityId
+    existingSecretNames: deduplicateKVSecrets ? keyVaultSecretList!.outputs.secretNameList : ''
+  }
 }
 
 module entraClientIdSecret './modules/security/keyvault-secret.bicep' = if (deployEntraClientSecrets) {
@@ -515,34 +532,37 @@ module documentIntelligence './modules/ai/document-intelligence.bicep' = if (dep
 // Imported from https://github.com/adamhockemeyer/ai-agent-experience
 // --------------------------------------------------------------------------------------------------------------
 // AI Project
+var numberOfProjects int = 1 // This is the number of AI Projects to create
+// deploying AI projects in sequence
+var aiDependencies = {
+  aiSearch: {
+    name: searchService.outputs.name
+    resourceId: searchService.outputs.id
+    resourceGroupName: searchService.outputs.resourceGroupName
+    subscriptionId: searchService.outputs.subscriptionId
+  }
+  azureStorage: {
+    name: storage.outputs.name
+    resourceId: storage.outputs.id
+    resourceGroupName: storage.outputs.resourceGroupName
+    subscriptionId: storage.outputs.subscriptionId
+  } 
+  cosmosDB: {
+    name: cosmos.outputs.name
+    resourceId: cosmos.outputs.id
+    resourceGroupName: cosmos.outputs.resourceGroupName
+    subscriptionId: cosmos.outputs.subscriptionId
+  }
+}
+
 module aiProject './modules/ai/ai-project-with-caphost.bicep' = {
   name: 'aiProject${deploymentSuffix}'
   params: {
-    location: location
     foundryName: aiFoundry.outputs.name
-    createHubCapabilityHost: true // required for non-vnet injected
-    projectNo: 1 // This is the number of AI Project
-    // Connect to existing resources
-    aiDependencies: {
-      aiSearch: {
-        name: searchService.outputs.name
-        resourceId: searchService.outputs.id
-        resourceGroupName: resourceGroup().name
-        subscriptionId: subscription().subscriptionId
-      }
-      cosmosDB: {
-        name: cosmos.outputs.name
-        resourceId: cosmos.outputs.id
-        resourceGroupName: resourceGroup().name
-        subscriptionId: subscription().subscriptionId
-      }
-      azureStorage: {
-        name: storage.outputs.name
-        resourceId: storage.outputs.id
-        resourceGroupName: resourceGroup().name
-        subscriptionId: subscription().subscriptionId
-  }
-}
+    location: location
+    projectNo: 1
+    createHubCapabilityHost: true   // this is required for non-vnet injected
+    aiDependencies: aiDependencies
   }
 }
 
@@ -554,7 +574,7 @@ module apim './modules/api-management/apim.bicep' = if (deployAPIM) {
   params: {
     location: location
     name: resourceNames.outputs.apimName
-    commonTags: commonTags
+    commonTags: tags
     publisherEmail: apimPublisherEmail
     publisherName: adminPublisherName
     appInsightsName: logAnalytics.outputs.applicationInsightsName
@@ -587,61 +607,52 @@ module managedEnvironment './modules/app/managedEnvironment.bicep' = if (deployC
   }
 }
 
-var apiTargetPort = 8000
-var apiSettings = [
+var containerAppSettings = [
+  { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: logAnalytics.outputs.appInsightsConnectionString }
+
+  { name: 'AppSettings__AppAgentEndpoint', value: aiProject.outputs.aiConnectionUrl }
+  { name: 'AppSettings__AppAgentId', value: 'TBD' }
+
+  { name: 'AZURE_CLIENT_ID', value: identity.outputs.managedIdentityClientId }
+  { name: 'AZURE_SDK_TRACING_IMPLEMENTATION', value: 'opentelemetry' }
+  { name: 'AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED', value: 'true' }
+
+  { name: 'SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS', value: 'true' }
+  { name: 'SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE', value: 'true' }
+]
+// { name: 'API_KEY', secretRef: 'apikey' }
+var apiUrlSettings = deployAPIApp ? [ 
   {
     name: 'API_URL'
     value: deployCAEnvironment
       ? 'https://${resourceNames.outputs.containerAppAPIName}.${managedEnvironment!.outputs.defaultDomain}/agent'
       : ''
   }
-  { name: 'API_KEY', secretRef: 'apikey' }
-  { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: logAnalytics.outputs.appInsightsConnectionString }
+] : []
 
-  { name: 'SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS', value: 'true' }
-  { name: 'SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE', value: 'true' }
-
-  { name: 'AZURE_AI_AGENT_ENDPOINT', value: aiProject.outputs.foundry_connection_string }
-  { name: 'AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME', value: gpt41_DeploymentName }
-
+var cosmosSettings = [
   { name: 'COSMOS_DB_ENDPOINT', value: cosmos.outputs.endpoint }
   { name: 'COSMOS_DB_API_SESSIONS_DATABASE_NAME', value: sessionsDatabaseName }
   { name: 'COSMOS_DB_API_SESSIONS_CONTAINER_NAME', value: sessionsContainerArray[0].name }
-
-  { name: 'AZURE_CLIENT_ID', value: identity.outputs.managedIdentityClientId }
-
-  { name: 'AZURE_SDK_TRACING_IMPLEMENTATION', value: 'opentelemetry' }
-  { name: 'AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED', value: 'true' }
-
-  { name: 'MOCK_USER_UPN', value: string(mockUserUpn) }
-]
-var apimSettings = deployAPIM
-  ? [
+  ]
+var apimSettings = deployAPIM ? [
   { name: 'APIM_BASE_URL', value: apimBaseUrl }
   { name: 'APIM_ACCESS_URL', value: apimAccessUrl }
   { name: 'APIM_KEY', secretRef: 'apimkey' }
   { name: 'API_MANAGEMENT_NAME', value: apim!.outputs.name }
   { name: 'API_MANAGEMENT_ID', value: apim!.outputs.id }
   { name: 'API_MANAGEMENT_ENDPOINT', value: apim!.outputs.gatewayUrl }
-    ]
-  : []
+  ] : []
 var entraSecuritySettings = deployEntraClientSecrets
   ? [
   { name: 'ENTRA_TENANT_ID', value: entraTenantId }
   { name: 'ENTRA_API_AUDIENCE', value: entraApiAudience }
   { name: 'ENTRA_SCOPES', value: entraScopes }
-      {
-        name: 'ENTRA_REDIRECT_URI'
-        value: entraRedirectUri ?? 'https://${resourceNames.outputs.containerAppUIName}.${managedEnvironment!.outputs.defaultDomain}/auth/callback'
-      }
+  { name: 'ENTRA_REDIRECT_URI', value: entraRedirectUri ?? 'https://${resourceNames.outputs.containerAppUIName}.${managedEnvironment!.outputs.defaultDomain}/auth/callback' }
   { name: 'ENTRA_CLIENT_ID', secretRef: 'entraclientid' }
   { name: 'ENTRA_CLIENT_SECRET', secretRef: 'entraclientsecret' }
-    ]
-  : []
-
-var baseSecretSet = {
-  apikey: apiKeySecret.outputs.secretUri
-}
+  ] : []
+var baseSecretSet = { }  // { apikey: apiKeySecret.outputs.secretUri }
 var apimSecretSet = empty(apimAccessKey)
   ? {}
   : {
@@ -654,6 +665,7 @@ var entraSecretSet = deployEntraClientSecrets
     }
   : {}
 
+var apiTargetPort = 8000
 module containerAppAPI './modules/app/containerappstub.bicep' = if (deployAPIApp) {
   name: 'ca-api-stub${deploymentSuffix}'
   params: {
@@ -669,21 +681,12 @@ module containerAppAPI './modules/app/containerappstub.bicep' = if (deployAPIApp
 
     tags: union(tags, { 'azd-service-name': 'api' })
     secrets: union(baseSecretSet, apimSecretSet, entraSecretSet) 
-    env: union(apiSettings, apimSettings, entraSecuritySettings)
+    env: union(containerAppSettings, apiUrlSettings, cosmosSettings, apimSettings, entraSecuritySettings)
   }
   dependsOn: deployAPIM ? [containerRegistry, apim] : [containerRegistry]
 }
 
 var UITargetPort = 8001
-var UISettings = union(apiSettings, [
-  {
-    name: 'API_URL'
-    value: deployCAEnvironment
-      ? 'https://${resourceNames.outputs.containerAppAPIName}.${managedEnvironment!.outputs.defaultDomain}/agent'
-      : ''
-  }
-])
-
 module containerAppUI './modules/app/containerappstub.bicep' = if (deployUIApp) {
   name: 'ca-UI-stub${deploymentSuffix}'
   params: {
@@ -698,7 +701,7 @@ module containerAppUI './modules/app/containerappstub.bicep' = if (deployUIApp) 
     imageName: uiImageName
     tags: union(tags, { 'azd-service-name': 'UI' })
     secrets: union(baseSecretSet, apimSecretSet, entraSecretSet)
-    env: union(UISettings, apimSettings, entraSecuritySettings)
+    env: union(containerAppSettings, apiUrlSettings, apimSettings, entraSecuritySettings)
   }
   dependsOn: deployAPIM ? [containerRegistry, apim] : [containerRegistry]
 }

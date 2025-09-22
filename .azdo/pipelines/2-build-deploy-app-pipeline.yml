@@ -9,13 +9,15 @@ trigger: none
 
 # ----------------------------------------------------------------------------------------------------
 parameters:
-- name: apps
-  displayName: Which App to build and deploy?
+- name: deployToEnvironment
+  displayName: Deploy To
   type: string
   values:
-    - ui
-    - none
-  default: 'ui'
+    - DEV
+    - QA
+    - PROD
+    - DEV-QA-PROD
+  default: DEV
 - name: buildApps
   displayName: Build Docker Images
   type: boolean
@@ -24,10 +26,18 @@ parameters:
   displayName: Push Images to ACR
   type: boolean
   default: true
-- name: deployApps
-  displayName: Deploy from ACR to CA
-  type: boolean
-  default: true
+- name: deployAction
+  displayName: Deploy Action
+  type: string
+  values:
+    - build-deploy
+    - create-build-deploy
+    - none
+  default: 'build-deploy'
+- name: updateACRFirewall
+  displayName: Update ACR Firewall
+  type: boolean 
+  default: false
 - name: runMSDevSecOpsScan
   displayName: Run Scan
   type: boolean
@@ -50,34 +60,25 @@ stages:
             runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
             runGHASScan: false
 
-# ----------------------------------------------------------------------------------------------------
-- ${{ if and(parameters.buildApps, contains(lower(parameters.apps), 'api')) }}:
-  - template: pipes/aca-build-one-pipe.yml
+- ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - template: pipes/build-deploy-app-pipe.yml
     parameters:
+      environments: ['${{ parameters.deployToEnvironment }}']
+      singleEnvironment: 'true'
       pushToACR: ${{ parameters.pushApps }}
-      apps: [ 
-        { containerAppName: 'api', acrAppName: 'chatapi', projectFolderName: 'src/api/chatapi',    port: '8080' }
-      ] 
-
-- ${{ if and(parameters.buildApps, contains(lower(parameters.apps), 'ui')) }}:
-  - template: pipes/aca-build-one-pipe.yml
-    parameters:
-      pushToACR: ${{ parameters.pushApps }}
+      deployAction: ${{ parameters.deployAction }}
+      updateACRFirewall: ${{ parameters.updateACRFirewall }}
       apps: [ 
         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
       ] 
 
-# ----------------------------------------------------------------------------------------------------
-- ${{ if and(parameters.deployApps, contains(lower(parameters.apps), 'api')) }}:
-  - template: pipes/aca-deploy-pipe.yml
+- ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - template: pipes/build-deploy-app-pipe.yml
     parameters:
-      apps: [ 
-        { containerAppName: 'api', acrAppName: 'chatapi', projectFolderName: 'src/api/chatapi',    port: '8080' }
-      ] 
-
-- ${{ if and(parameters.deployApps, contains(lower(parameters.apps), 'ui')) }}:
-  - template: pipes/aca-deploy-pipe.yml
-    parameters:
+      environments: ['DEV', 'QA', 'PROD']
+      pushToACR: ${{ parameters.pushApps }}
+      deployAction: ${{ parameters.deployAction }}
+      updateACRFirewall: ${{ parameters.updateACRFirewall }}
       apps: [ 
         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
       ] 

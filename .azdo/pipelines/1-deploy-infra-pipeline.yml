@@ -31,16 +31,13 @@ parameters:
       - PROD
       - DEV-QA-PROD
     default: DEV
-
   - name: bicepVersion
     displayName: Basic or Advanced
     type: string
     values:
       - basic
       - advanced
-    #  - test
     default: basic
-
   - name: appsToDeploy
     displayName: Which Apps to build and deploy?
     type: string
@@ -48,7 +45,6 @@ parameters:
       - ui
       - none
     default: 'ui'
-
   - name: bicepDeploymentMode
     displayName: Deploy Mode
     type: string
@@ -57,22 +53,18 @@ parameters:
       - Validation
       - Complete
     default: Incremental
-    
   - name: createResourceGroup
     displayName: Create Resource Group?
     type: boolean
     default: true
-
   - name: addRoleAssignments
     displayName: Add Role Assignments?
     type: boolean
     default: true
-
   - name: publicAccessEnabled
     displayName: Make Web Apps Public?
     type: boolean
     default: true
-
   - name: runMSDevSecOpsScan
     displayName: Run MS DevSecOps Scan?
     type: boolean

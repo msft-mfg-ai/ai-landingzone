@@ -34,7 +34,7 @@ public class ChatController(
             MessageRole.User,
             prompt);
 
-        ThreadRun run = await _client.Runs.CreateRunAsync(threadId, _config.AIAgentId);
+        ThreadRun run = await _client.Runs.CreateRunAsync(threadId, _config.AppAgentId);
 
         while (run.Status == RunStatus.Queued || run.Status == RunStatus.InProgress || run.Status == RunStatus.RequiresAction)
         {

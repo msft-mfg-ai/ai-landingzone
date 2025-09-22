@@ -19,29 +19,16 @@ on:
         description: Environment
         required: true
         type: environment
-        # default: 'dev'
-      runBuildDeployAPI:
-        description: Build and Deploy API
-        required: false
-        default: true
-        type: boolean
-      runBuildDeployUI:
-        description: Build and Deploy UI
-        required: false
-        default: false
-        type: boolean
-      runCreateACAs:
-        description: Create\Update Container Apps
-        required: false
-        default: false
-        type: boolean        
+      deployAction:
+        description: Deployment Action
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - build-deploy
+          - create-build-deploy
       runMSSecurityScan:
         description: Run MS DevSecOps Security Scan
-        required: false
-        default: true
-        type: boolean
-      runGHASSecurityScan:
-        description: Run GHAS Scan
         required: false
         default: false
         type: boolean
@@ -67,12 +54,7 @@ permissions:
 env:
   # these are defined by the project itself, so they can stay here...
   ACR_REPO_NAME: 'aiapps'
-
-  API_APP_PATH: ''
-  API_ACR_APP_NAME: 'chatapi'
-  API_PORT: '8000'
-
-  UI_APP_PATH: 'ui/gradio_ui'
+  UI_APP_PATH: 'src/website/chatui'
   UI_ACR_APP_NAME: 'chatui'
   UI_PORT: '8001'
 
@@ -88,20 +70,14 @@ jobs:
       ENV_CODE: ${{ inputs.deployEnvironment }}
       APP_NAME: ${{ vars.APP_NAME }}
       APP_NAME_NO_DASHES: ${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}
-
       RESOURCEGROUPNAME: ${{ steps.set-env.outputs.RESOURCEGROUPNAME }}
+      USER_ASSIGNED_IDENTITY_ID: 'id-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      KEY_VAULT_NAME: 'kv${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
 
-      ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.GLOBAL_REGION_CODE }}${{ vars.INSTANCE_NUMBER }}'
+      ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
       ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
-
-      CONTAINER_APP_ENV_NAME: '${{ steps.set-env.outputs.CONTAINER_APP_ENV_NAME }}'
-
-      API_CONTAINER_APP_NAME: 'ca-api-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
-      API_APP_PATH: ${{ env.API_APP_PATH }}
-      API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}
-      API_PORT: ${{ env.API_PORT }}
-
-      UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ steps.set-env.outputs.ENV_DASH_REGION_DASH_INSTANCE }}'
+      CONTAINER_APP_ENV_NAME: 'cae-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
       UI_APP_PATH: ${{ env.UI_APP_PATH }}
       UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
       UI_PORT: ${{ env.UI_PORT }}
@@ -133,18 +109,17 @@ jobs:
           ACR_NAME="$(echo ${{ vars.ACR_NAME }} | tr '[:upper:]' '[:lower:]')"
           echo "ACR_NAME=$ACR_NAME" >> $GITHUB_OUTPUT
 
-          CONTAINER_APP_ENV_NAME="${{ vars.CONTAINER_APP_ENV_NAME }}"
+          CONTAINER_APP_ENV_NAME="$(echo ${{ vars.CONTAINER_APP_ENV_NAME }} | tr '[:upper:]' '[:lower:]')"
           echo "CONTAINER_APP_ENV_NAME=$CONTAINER_APP_ENV_NAME" >> $GITHUB_OUTPUT
+
+          KEY_VAULT_NAME="$(echo ${{ vars.KEY_VAULT_NAME }} | tr '[:upper:]' '[:lower:]')"
+          echo "KEY_VAULT_NAME=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
 
           echo "APP_NAME_NO_DASHES: $APP_NAME_NO_DASHES"
           echo "RESOURCEGROUPNAME: $RESOURCEGROUPNAME"
           echo "ENV_DASH_REGION_DASH_INSTANCE: $ENV_DASH_REGION_DASH_INSTANCE"
           echo "ACR_NAME: $ACR_NAME"
           echo "CONTAINER_APP_ENV_NAME: $CONTAINER_APP_ENV_NAME"
-
-          echo "API_APP_PATH: ${{ env.API_APP_PATH }}"
-          echo "API_ACR_APP_NAME: ${{ env.API_ACR_APP_NAME }}"
-          echo "API_PORT: ${{ env.API_PORT }}"
 
           echo "UI_APP_PATH: ${{ env.UI_APP_PATH }}"
           echo "UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}"
@@ -154,36 +129,15 @@ jobs:
   scan-code:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
-    if: inputs.runMSSecurityScan || inputs.runGHASSecurityScan
+    if: inputs.runMSSecurityScan
     secrets: inherit
     with:
       runMSDevSecOpsScan: ${{ inputs.runMSSecurityScan }}
-      runGHASScan: ${{ inputs.runGHASSecurityScan }}
-
-  # ------------------------------------------------------------------------------------------------------------------------
-  build-api:
-    name: Build API Image
-    uses: ./.github/workflows/template-aca-build.yml
-    if: inputs.runBuildDeployAPI
-    needs:
-      - template-env
-    secrets: inherit
-    with:
-      ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
-      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
-
-      ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
-      ACR_REPO_NAME: ${{ needs.template-env.outputs.ACR_REPO_NAME }}
-      ACR_FW_UPDATE: ${{ inputs.updateACRFirewall }}
-
-      APP_PATH: ${{ needs.template-env.outputs.API_APP_PATH }}
-      ACR_APP_NAME: ${{ needs.template-env.outputs.API_ACR_APP_NAME }}
 
   # ------------------------------------------------------------------------------------------------------------------------
   build-ui:
     name: Build UI Image
     uses: ./.github/workflows/template-aca-build.yml
-    if: inputs.runBuildDeployUI
     needs:
       - template-env
     secrets: inherit
@@ -199,28 +153,10 @@ jobs:
       ACR_APP_NAME: ${{ needs.template-env.outputs.UI_ACR_APP_NAME }}
 
   # ------------------------------------------------------------------------------------------------------------------------
-  deploy-api:
-    name: Deploy API to ${{ inputs.deployEnvironment }}
-    uses: ./.github/workflows/template-aca-deploy.yml
-    if: inputs.runBuildDeployAPI && !inputs.runCreateACAs
-    needs:
-      - build-api
-      - template-env
-    secrets: inherit
-    with:
-      ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
-      ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
-      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
-      CONTAINER_APP_ENV_NAME: ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }}
-      CONTAINER_NAME: ${{ needs.template-env.outputs.API_CONTAINER_APP_NAME }}
-      PORT: ${{ needs.template-env.outputs.API_PORT }}
-      IMAGE_NAME: ${{ needs.build-api.outputs.IMAGE_NAME }}
-
-  # ------------------------------------------------------------------------------------------------------------------------
-  deploy-ui:
+  deploy-existing-ui:
     name: Deploy UI to ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-aca-deploy.yml
-    if: inputs.runBuildDeployUI && !inputs.runCreateACAs
+    if: ${{ inputs.deployAction == 'build-deploy' }}
     needs:
       - build-ui
       - template-env
@@ -234,108 +170,22 @@ jobs:
       PORT: ${{ needs.template-env.outputs.UI_PORT }}
       IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
 
-  create-api:
-    # You can't pass environment variables to templates, so put them in outputs here that you CAN pass
-    name: Create API Container App
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.deployEnvironment }}
-    if: inputs.runCreateACAs && inputs.runBuildDeployAPI
+  # ------------------------------------------------------------------------------------------------------------------------
+  create-deploy-ui:
+    name: Create Container App in ${{ inputs.deployEnvironment }}
+    uses: ./.github/workflows/template-aca-create.yml
+    if: ${{ inputs.deployAction == 'create-build-deploy' }}
     needs:
-      - template-env
-      - build-api
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Azure Login (Reusable Action)
-        uses: ./.github/actions/login-action
-        with:
-          client-id: ${{ secrets.CICD_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.CICD_CLIENT_SECRET }}
-
-      - name: Create API Container App
-        run: |
-          echo "Creating API Container App..."
-          az containerapp create \
-            --name ${{ needs.template-env.outputs.API_CONTAINER_APP_NAME }} \
-            --resource-group ${{ needs.template-env.outputs.RESOURCEGROUPNAME }} \
-            --environment ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }} \
-            --image ${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io/${{ needs.build-api.outputs.IMAGE_NAME }} \
-            --target-port ${{ needs.template-env.outputs.API_PORT }} \
-            --secrets apimkey=${{ secrets.APIM_KEY }} \
-            --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
-            SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS=true \
-            SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE=true \
-            AZURE_AI_AGENT_ENDPOINT="${{ vars.AZURE_AI_AGENT_ENDPOINT }}" \
-            AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME="${{ vars.AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME }}" \
-            COSMOS_DB_ENDPOINT="${{ vars.COSMOS_DB_ENDPOINT }}" \
-            COSMOS_DB_API_SESSIONS_DATABASE_NAME="sessions" \
-            COSMOS_DB_API_SESSIONS_CONTAINER_NAME="apisessions" \
-            ENTRA_TENANT_ID="${{ vars.ENTRA_TENANT_ID }}" \
-            ENTRA_API_AUDIENCE="${{ vars.ENTRA_API_AUDIENCE }}" \
-            APIM_BASE_URL="${{ vars.APIM_BASE_URL }}" \
-            APIM_ACCESS_URL="${{ vars.APIM_ACCESS_URL }}" \
-            APIM_KEY=secretref:apimkey \
-            AZURE_CLIENT_ID="${{ vars.USER_ASSIGNED_IDENTITY_CLIENT_ID }}" \
-            --cpu 0.5 \
-            --memory 1.0 \
-            --min-replicas 2 \
-            --max-replicas 5 \
-            --ingress external \
-            --user-assigned "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-            --registry-identity "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-            --registry-server "${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io" \
-            --container-name app
-
-
-  create-ui:
-    # You can't pass environment variables to templates, so put them in outputs here that you CAN pass
-    name: Create UI Container App
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.deployEnvironment }}
-    if: inputs.runCreateACAs && inputs.runBuildDeployUI
-    needs:
-      - template-env
       - build-ui
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Azure Login (Reusable Action)
-        uses: ./.github/actions/login-action
-        with:
-          client-id: ${{ secrets.CICD_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.CICD_CLIENT_SECRET }}
-
-      - name: Create UI Container App
-        run: |
-          echo "Creating UI Container App..."
-          az containerapp create \
-            --name ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }} \
-            --resource-group ${{ needs.template-env.outputs.RESOURCEGROUPNAME }} \
-            --environment ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }} \
-            --image ${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io/${{ needs.build-ui.outputs.IMAGE_NAME }} \
-            --target-port ${{ needs.template-env.outputs.UI_PORT }} \
-            --secrets entraclientid="${{ secrets.ENTRA_CLIENT_ID }}" entraclientsecret="${{ secrets.ENTRA_CLIENT_SECRET }}" \
-            --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
-            COSMOS_DB_ENDPOINT="${{ vars.COSMOS_DB_ENDPOINT }}" \
-            COSMOS_DB_SESSIONS_DATABASE_NAME="sessions" \
-            COSMOS_DB_SESSIONS_CONTAINER_NAME="uisessions" \
-            ENTRA_CLIENT_ID=secretref:entraclientid \
-            ENTRA_CLIENT_SECRET=secretref:entraclientsecret \
-            ENTRA_TENANT_ID="${{ vars.ENTRA_TENANT_ID }}" \
-            ENTRA_SCOPES="${{ vars.ENTRA_SCOPES }}" \
-            ENTRA_REDIRECT_URI="${{ vars.ENTRA_REDIRECT_URI }}" \
-            API_URL="${{ vars.API_URL}}" \
-            AZURE_CLIENT_ID="${{ vars.USER_ASSIGNED_IDENTITY_CLIENT_ID }}" \
-            --cpu 0.5 \
-            --memory 1.0 \
-            --min-replicas 1 \
-            --max-replicas 1 \
-            --ingress external \
-            --user-assigned "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-            --registry-identity "${{ vars.USER_ASSIGNED_IDENTITY_ID }}" \
-            --registry-server "${{ needs.template-env.outputs.ACR_NAME }}.azurecr.io" \
-            --container-name app
+      - template-env
+    secrets: inherit
+    with:
+      ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
+      ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
+      CONTAINER_APP_ENV_NAME: ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }}
+      CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
+      PORT: ${{ needs.template-env.outputs.UI_PORT }}
+      IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
+      USER_ASSIGNED_IDENTITY_ID: ${{ needs.template-env.outputs.USER_ASSIGNED_IDENTITY_ID }}
+      KEY_VAULT_NAME: ${{ needs.template-env.outputs.KEY_VAULT_NAME }}
