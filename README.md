@@ -20,7 +20,13 @@ This reference implementation deploys an AI Landing Zone for Azure OpenAI, which
 
 ---
 
-## GitHub Workflows
+## CI/CD Automation
+
+### Azure DevOps Pipelines
+
+[Azure DevOps Pipelines Setup Instructions](.azuredevops/readme.md)
+
+### GitHub Workflows
 
 [GitHub Actions Setup Instructions](.github/setup.md)
 
