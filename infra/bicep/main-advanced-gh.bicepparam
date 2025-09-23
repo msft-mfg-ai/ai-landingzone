@@ -21,7 +21,6 @@ param regionCode = '#{GLOBAL_REGION_CODE}#'
 
 param logRetentionInDays = empty('#{LOG_RETENTION_DAYS}#') ? 365 : int('#{LOG_RETENTION_DAYS}#')
 
-
 param businessOwnerTag  = '#{BUSINESS_OWNER}#'
 param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
 param costCenterTag  = '#{COST_CENTER}#'
@@ -46,6 +45,9 @@ param addRoleAssignments = empty('#{addRoleAssignments}#') ? false : toLower('#{
 param createDnsZones = true
 param publicAccessEnabled = false
 param makeWebAppsPublic = empty('#{makeWebAppsPublic}#') ? false : toLower('#{makeWebAppsPublic}#') == 'true'
+
+param existingVnetName = empty('#{EXISTING_VNET_NAME}#') ? null : '#{EXISTING_VNET_NAME}#'
+param existingVnetResourceGroupName = empty('#{EXISTING_VNET_RESOURCE_GROUP_NAME}#') ? null : '#{EXISTING_VNET_RESOURCE_GROUP_NAME}#'
 
 param vm_username = empty('#{VM_USERNAME}#') ? null : '#{VM_USERNAME}#' // This is the username for the admin user of jumpboxvm
 param vm_password = empty('#{VM_PASSWORD}#') ? null : '#{VM_PASSWORD}#' // This is the password for the admin user of jumpboxvm
