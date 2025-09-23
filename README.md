@@ -24,7 +24,7 @@ This reference implementation deploys an AI Landing Zone for Azure OpenAI, which
 
 ### Azure DevOps Pipelines
 
-[Azure DevOps Pipelines Setup Instructions](.azuredevops/readme.md)
+[Azure DevOps Pipelines Setup Instructions](.azdo/pipelines/readme.md)
 
 ### GitHub Workflows
 
