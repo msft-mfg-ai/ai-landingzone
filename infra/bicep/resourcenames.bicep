@@ -98,14 +98,14 @@ output root_vnet_Name string               = toLower('${resourceAbbreviations.ne
 output vnetNsgName string                  = toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}-001')
                                
 output subnet object = {
-  appGwName:                                 toLower('snet-app-gateway')
-  appSeName:                                 toLower('snet-app-services')
-  peName:                                    toLower('snet-private-endpoint')
-  agentName:                                 toLower('snet-agent')
+  appGwName:                                 'sn-AppGw'
+  appSeName:                                 'sn-AppSe'
+  peName:                                    'sn-PrivateEndpoint'
+  agentName:                                 'sn-Agent'
   bastionName:                               'AzureBastionSubnet' // Must be exactly this name for Azure Bastion
-  jumpboxName:                               toLower('snet-jumpbox')  
-  trainingName:                              toLower('snet-training')
-  scoringName:                               toLower('snet-scoring')
+  jumpboxName:                               'sn-JumpBox'
+  trainingName:                              'sn-training'
+  scoringName:                               'sn-scoring'
 }
 
 output vm object = {
