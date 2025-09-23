@@ -20,6 +20,8 @@ param principalId = '#{USER_PRINCIPAL_ID}#'
 param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
 
+param logRetentionInDays = empty('#{LOG_RETENTION_DAYS}#') ? 365 : int('#{LOG_RETENTION_DAYS}#')
+
 param businessOwnerTag  = '#{BUSINESS_OWNER}#'
 param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
 param costCenterTag  = '#{COST_CENTER}#'
