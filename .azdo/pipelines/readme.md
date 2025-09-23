@@ -78,13 +78,13 @@ See [Azure DevOps Service Connections](https://learn.microsoft.com/en-us/azure/d
 
 ```yml
 - name: serviceConnectionName
-  value: 'DEV Service Connection'
-- name: serviceConnectionDEV
-  value: 'DEV Service Connection'
-- name: serviceConnectionQA
-  value: 'QA Service Connection'
-- name: serviceConnectionProd
-  value: 'PROD Service Connection'
+  value: 'DV Service Connection'
+- name: serviceConnectionDV
+  value: 'DV Service Connection'
+- name: serviceConnectionTS
+  value: 'TS Service Connection'
+- name: serviceConnectionPD
+  value: 'PD Service Connection'
 ```
 
 ## Update the Common Variables File with your settings
@@ -100,7 +100,7 @@ Customize your deploy by editing the [vars/var-common.yml](./vars/var-common.yml
 
 ## Update the Environment Specific Variables File with your settings
 
-Customize your deploy by editing the [vars/var-dev.yml](./vars/var-dev.yml) file. This file contains the following variables which you can change:
+Customize your deploy by editing the [vars/var-dv.yml](./vars/var-dv.yml) file. This file contains the following variables which you can change:
 
 ```bash
   - name:   RESOURCEGROUP_LOCATION
