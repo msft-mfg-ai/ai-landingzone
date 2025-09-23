@@ -45,14 +45,18 @@ To create this variable groups, customize and run this command in the Azure Clou
      --variables `
          APP_NAME='myailz' `
          RESOURCEGROUP_PREFIX='rg-ailz' `
-         COST_CENTER='9999999' `
-         APPLICATION_OWNER='SomeAppOwner' `
-         BUSINESS_OWNER='SomeBusOwner' `
-         CREATED_BY='SomeCreator' `
-         OWNER_EMAIL='applicationowner@company.com' `
+         INSTANCE_NUMBER='001' `
          MY_IP_ADDRESS='<yourPublicIpAddress>' `
          USER_PRINCIPAL_ID='<yourAdminPrincipalId>'
 ```
+
+<!-- 
+     CREATED_BY='SomeCreator' `
+     APPLICATION_OWNER='SomeAppOwner' `
+     BUSINESS_OWNER='SomeBusOwner' `
+     COST_CENTER='9999999' `
+     OWNER_EMAIL='applicationowner@company.com' ` 
+-->
 
 ## Resource Group Name
 

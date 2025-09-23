@@ -229,10 +229,10 @@ param logRetentionInDays int = 365
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
-param businessOwnerTag string = 'UNKNOWN'
-param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
-param costCenterTag string = 'UNKNOWN'
+// param businessOwnerTag string = 'UNKNOWN'
+// param applicationOwnerTag string = 'UNKNOWN'
+// param costCenterTag string = 'UNKNOWN'
 
 // --------------------------------------------------------------------------------------------------------------
 // A variable masquerading as a parameter to allow for dynamic value assignment in Bicep
@@ -255,9 +255,9 @@ var tags = {
   'created-by': createdByTag
   'application-name': applicationName
   'environment-name': environmentName
-  'application-owner': applicationOwnerTag
-  'business-owner': businessOwnerTag
-  'cost-center': costCenterTag
+  // 'application-owner': applicationOwnerTag
+  // 'business-owner': businessOwnerTag
+  // 'cost-center': costCenterTag
 }
 
 // Run a script to dedupe the KeyVault secrets -- this fails on private networks right now so turn if off for them
