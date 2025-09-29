@@ -88,7 +88,6 @@ jobs:
             --env-vars \
               AppSettings__AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
               AppSettings__AppAgentId="${{ vars.APP_AGENT_ID }}" \
-              APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" \
               AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
               AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
               AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \

@@ -35,6 +35,8 @@ To create this variable groups, customize and run this command in the Azure Clou
 
 > Alternatively, you could define these variables in the Azure DevOps Portal on each pipeline, but a variable group is a more repeatable and maintainable way to do it.
 
+> Note: The APP_AGENT_ENDPOINT and APP_AGENT_ID are needed only if you are deploying the sample Chat UI app included in this repository. These should point to an Agent defined in your AI Foundry which will be used by the Chat UI App. You will need to deploy the AI Foundry first, then create the agent, then come back and update these values and deploy the Chat UI App.
+
 ```bash
    az login
 
@@ -45,14 +47,20 @@ To create this variable groups, customize and run this command in the Azure Clou
      --variables `
          APP_NAME='myailz' `
          RESOURCEGROUP_PREFIX='rg-ailz' `
-         COST_CENTER='9999999' `
-         APPLICATION_OWNER='SomeAppOwner' `
-         BUSINESS_OWNER='SomeBusOwner' `
-         CREATED_BY='SomeCreator' `
-         OWNER_EMAIL='applicationowner@company.com' `
+         INSTANCE_NUMBER='001' `
          MY_IP_ADDRESS='<yourPublicIpAddress>' `
-         USER_PRINCIPAL_ID='<yourAdminPrincipalId>'
+         USER_PRINCIPAL_ID='<yourAdminPrincipalId>' `
+         APP_AGENT_ENDPOINT='<url>' `
+         APP_AGENT_ID='<string>'
 ```
+
+<!-- 
+     CREATED_BY='SomeCreator' `
+     APPLICATION_OWNER='SomeAppOwner' `
+     BUSINESS_OWNER='SomeBusOwner' `
+     COST_CENTER='9999999' `
+     OWNER_EMAIL='applicationowner@company.com' ` 
+-->
 
 ## Resource Group Name
 
@@ -88,8 +96,6 @@ See [Azure DevOps Service Connections](https://learn.microsoft.com/en-us/azure/d
 Customize your deploy by editing the [vars/var-common.yml](./vars/var-common.yml) file. This file contains the following variables which you can change:
 
 ```bash
-  - name: INSTANCE_NUMBER
-    value: '001'
   - name: GLOBAL_REGION_CODE
     value: 'US'
 ```

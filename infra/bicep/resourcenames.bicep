@@ -7,7 +7,7 @@ param applicationName string = ''
 @description('Root Application Name that this is based on')
 param rootApplication string = ''
 
-@description('Environment name for the application, e.g. azd, dev, demo, qa, stg, ct, prod. This is used to differentiate resources in different environments.')
+@description('Environment name for the application, e.g. azd, dev, demo, qa, test, stage, ct, prod. This is used to differentiate resources in different environments.')
 param environmentName string = 'dev'
 
 @description('Global Region where the resources will be deployed, e.g. AM (America), EM (EMEA), AP (APAC), CH (China)')
@@ -16,7 +16,7 @@ param regionCode string = 'US'
 
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 @maxLength(3)
-@minLength(3)
+@minLength(1)
 param instance string = '000'
 
 @description('Optional resource token to ensure uniqueness - leave blank if desired')
@@ -43,7 +43,7 @@ var resourceTokenWithoutDash = resourceToken == '' ? '' : '${resourceToken}'
 
 var dashInstance = instance == '' ? '' : toLower('-${instance}')
 var dashProject = instance == '' ? '' : toLower('-${projectNumber}')
-var partialInstance = substring(instance, 2, 1) // get last digit of a three digit code
+var partialInstance = length(instance) > 2 ? substring(instance, 2, 1) : instance // get last digit of a three digit code
 var partialRegion = substring(regionCode, 0, 1) // get first digit of a two digit code
 
 // pull resource abbreviations from a common JSON file
@@ -95,17 +95,17 @@ output storageAccountName string           = take('${resourceAbbreviations.stora
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 output vnet_Name string                    = toLower('${resourceAbbreviations.networkVirtualNetworks}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}')
 output root_vnet_Name string               = toLower('${resourceAbbreviations.networkVirtualNetworks}-${sanitizedRootApplication}-${sanitizedEnvironment}${dashInstance}')
-output vnetNsgName string                  = toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}-001')
+output vnetNsgName string                  = toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}')
                                
 output subnet object = {
-  appGwName:                                 toLower('snet-app-gateway')
-  appSeName:                                 toLower('snet-app-services')
-  peName:                                    toLower('snet-private-endpoint')
-  agentName:                                 toLower('snet-agent')
+  appGwName:                                 'sn-AppGw'
+  appSeName:                                 'sn-AppSe'
+  peName:                                    'sn-PrivateEndpoint'
+  agentName:                                 'sn-Agent'
+  jumpboxName:                               'sn-JumpBox'
+  trainingName:                              'sn-training'
+  scoringName:                               'sn-scoring'
   bastionName:                               'AzureBastionSubnet' // Must be exactly this name for Azure Bastion
-  jumpboxName:                               toLower('snet-jumpbox')  
-  trainingName:                              toLower('snet-training')
-  scoringName:                               toLower('snet-scoring')
 }
 
 output vm object = {
@@ -122,33 +122,33 @@ output bastion object = {
   pip_name:                                  toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}')
 }
 output project_vm object = {
-  vm_name:                                   toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${projectNumber}')
-  vm_name_15:                                take(toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${projectNumber}'),15)
-  vm_nic_name:                               toLower('${resourceAbbreviations.networkNetworkInterfaces}${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
-  vm_pip_name:                               toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
-  vm_os_disk_name:                           toLower('${resourceAbbreviations.computeDisks}-${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
-  vm_nsg_name:                               toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
-  bastion_host_name:                         toLower('${resourceAbbreviations.networkBastionHosts}${sanitizedAppName}-${sanitizedEnvironment}${dashProject}')
-  bastion_pip_name:                          toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashProject}')
+  vm_name:                                   toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${instance}${projectNumber}')
+  vm_name_15:                                take(toLower('${resourceAbbreviations.computeVirtualMachines}oaz${sanitizedAppName}${sanitizedEnvironment}${instance}${projectNumber}'),15)
+  vm_nic_name:                               toLower('${resourceAbbreviations.networkNetworkInterfaces}${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
+  vm_pip_name:                               toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
+  vm_os_disk_name:                           toLower('${resourceAbbreviations.computeDisks}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
+  vm_nsg_name:                               toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
+  bastion_host_name:                         toLower('${resourceAbbreviations.networkBastionHosts}${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
+  bastion_pip_name:                          toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}${dashInstance}${dashProject}')
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Private Endpoint Names (sequential) -- created for the customer need
 output pe object = {
-  storageAccountBlobName:                    toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-001')
-  storageAccountTableName:                   toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-002')
-  storageAccountQueueName:                   toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-003')
-  cosmosDbName:                              toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-004')
-  keyVaultName:                              toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-005')
-  acrName:                                   toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-006')
-  searchServiceName:                         toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-007')
-  openAIName:                                toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-008')
-  containerAppsName:                         toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-009')
-  documentIntelligenceName:                  toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-010')
-  openAIServiceConnection:                   toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-011')
-  aIHubName:                                 toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-012')
-  appInsightsName:                           toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-013')
-  monitorName:                               toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}-014')
+  storageAccountBlobName:   toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.storageStorageAccounts}-blob')
+  storageAccountTableName:  toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.storageStorageAccounts}-table')
+  storageAccountQueueName:  toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.storageStorageAccounts}-queue')
+  cosmosDbName:             toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.documentDBDatabaseAccounts}')
+  keyVaultName:             toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.keyVaultVaults}')
+  acrName:                  toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.containerRegistryRegistries}')
+  containerAppsName:        toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.appContainerApps}')
+  appInsightsName:          toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.insightsComponents}')
+  monitorName:              toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.operationalInsightsWorkspaces}')
+  searchServiceName:        toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.searchSearchServices}')
+  openAIName:               toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.cognitiveServicesOpenAI}')
+  openAIServiceConnection:  toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.cognitiveServicesOpenAI}-conn')
+  documentIntelligenceName: toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.documentIntelligence}')
+  aIHubName:                toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.cognitiveServicesHub}')
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
