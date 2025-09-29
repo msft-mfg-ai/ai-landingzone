@@ -22,6 +22,9 @@ parameters:
   - name: acrFolderName
     default: 'appImages'
     type: string
+  - name: updateFirewall
+    default: true
+    type: boolean
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
@@ -65,8 +68,8 @@ jobs:
             echo "##vso[task.setvariable variable=caAppName]$caAppName"
             $imageName="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.BuildId)"
             echo "##vso[task.setvariable variable=imageName]$imageName"
-            $acrName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
-            echo "##vso[task.setvariable variable=acrName]$acrName"
+            $containerRegistryName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
             $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
 
@@ -77,6 +80,9 @@ jobs:
             $containerAppEnvName="cae-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
             echo "##vso[task.setvariable variable=containerAppEnvName]$containerAppEnvName"
 
+            $agentIpAddress = $(Invoke-WebRequest -Uri "https://api.ipify.org").Content
+            echo "##vso[task.setvariable variable=agentIpAddress]$agentIpAddress"
+
             echo "environmentCodeLower=$environmentCodeLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"
             echo "resourceGroupName=$resourceGroupName"
@@ -86,7 +92,7 @@ jobs:
             echo "caAppName=$caAppName"
             echo "containerRegistryUrl=$containerRegistryUrl"
             echo "imageName=$imageName"
-            echo "acrName=$acrName"
+            echo "containerRegistryName=$containerRegistryName"
             echo "keyVaultName=$keyVaultName"
             echo "containerRegistryUrl=$containerRegistryUrl"
             echo "userAssignedIdentityId=$userAssignedIdentityId"
@@ -103,12 +109,15 @@ jobs:
       - task: AzureCLI@2
         displayName: Deploy Container App
         inputs:
-          AzureSubscription: $(serviceConnectionName)
+          AzureSubscription: ${{ parameters.serviceConnectionName }}
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            echo "Logging in to $(containerRegistryName)"
+            az acr login -n $(containerRegistryName)
+            
             echo "Deploying Container App: $(caAppName) to Resource Group: $(resourceGroupName) in Environment: $(containerAppEnvName)"
-            echo 'EXECUTING: az containerapp create --name $(caAppName) --resource-group $(resourceGroupName) --environment $(containerAppEnvName) --image $(containerRegistryUrl)/$(imageName) --target-port ${{ parameters.port }} --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" APPLICATIONINSIGHTS_CONNECTION_STRING="$(appInsightsConnectionString)" AZURE_CLIENT_ID="$userAssignedIdentityId" ... --user-assigned "$userAssignedIdentityId" --registry-server "$(acrName).azurecr.io" ... '
+            echo 'EXECUTING: az containerapp create --name $(caAppName) --resource-group $(resourceGroupName) --environment $(containerAppEnvName) --image $(containerRegistryUrl)/$(imageName) --target-port ${{ parameters.port }} --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" AZURE_CLIENT_ID="$userAssignedIdentityId" ... --user-assigned "$userAssignedIdentityId" --registry-server "$(containerRegistryName).azurecr.io" ... '
             az containerapp create \
               --name $(caAppName) \
               --resource-group $(resourceGroupName) \
@@ -118,17 +127,17 @@ jobs:
               --env-vars \
                 AppSettings__AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" \
                 AppSettings__AppAgentId="$(APP_AGENT_ID)" \
-                APPLICATIONINSIGHTS_CONNECTION_STRING="$(APPINSIGHTS_CONNECTIONSTRING)" \
                 AZURE_CLIENT_ID="$(userAssignedIdentityId)" \
                 AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
                 AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
                 SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
                 SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
               --user-assigned "$(userAssignedIdentityId)" \
-              --registry-server "$(acrName).azurecr.io" \
+              --registry-server "$(containerRegistryName).azurecr.io" \
               --cpu 0.5 \
               --memory 1.0 \
               --min-replicas 1 \
               --max-replicas 1 \
               --ingress external \
               --container-name app
+

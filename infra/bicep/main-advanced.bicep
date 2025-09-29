@@ -59,7 +59,7 @@ param existingVnetName string = ''
 @description('If you provide an existing VNET what resource group is it in?')
 param existingVnetResourceGroupName string = ''
 @description('If you provide this is will be used instead of creating a new VNET')
-param vnetPrefix string = '172.16.4.0/22'                         // '172.16.4.0/22'   -or- '10.183.4.0/22'
+param vnetPrefix string = '10.237.144.0/22'                         // '172.16.4.0/22'   -or- '10.183.4.0/22'
 param subnetAppGwName string = ''
 param subnetAppGwPrefix string = cidrSubnet(vnetPrefix, 24, 1)    // '172.16.5.0/24'   -or- '10.183.5.0/24'
 param subnetAppSeName string = ''
@@ -223,13 +223,16 @@ param regionCode string = 'US'
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 param instanceNumber string = '001' // used to differentiate multiple instances of the same application in the same environment
 
+@description('Number of days to retain logs in Log Analytics workspace')
+param logRetentionInDays int = 365
+
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
-param businessOwnerTag string = 'UNKNOWN'
-param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
-param costCenterTag string = 'UNKNOWN'
+// param businessOwnerTag string = 'UNKNOWN'
+// param applicationOwnerTag string = 'UNKNOWN'
+// param costCenterTag string = 'UNKNOWN'
 
 // --------------------------------------------------------------------------------------------------------------
 // A variable masquerading as a parameter to allow for dynamic value assignment in Bicep
@@ -252,9 +255,9 @@ var tags = {
   'created-by': createdByTag
   'application-name': applicationName
   'environment-name': environmentName
-  'application-owner': applicationOwnerTag
-  'business-owner': businessOwnerTag
-  'cost-center': costCenterTag
+  // 'application-owner': applicationOwnerTag
+  // 'business-owner': businessOwnerTag
+  // 'cost-center': costCenterTag
 }
 
 // Run a script to dedupe the KeyVault secrets -- this fails on private networks right now so turn if off for them
@@ -300,6 +303,7 @@ module vnet './modules/networking/vnet.bicep' = {
     subnetAppSePrefix: subnetAppSePrefix
     subnetPeName: !empty(subnetPeName) ? subnetPeName : resourceNames.outputs.subnet.peName
     subnetPePrefix: subnetPePrefix
+    subnetPeRouteTableEnabled: true
     subnetAgentName: !empty(subnetAgentName) ? subnetAgentName : resourceNames.outputs.subnet.agentName
     subnetAgentPrefix: subnetAgentPrefix
     subnetBastionName: !empty(subnetBastionName) ? subnetBastionName : resourceNames.outputs.subnet.bastionName
@@ -368,6 +372,7 @@ module logAnalytics './modules/monitor/loganalytics.bicep' = {
     newLogAnalyticsName: resourceNames.outputs.logAnalyticsWorkspaceName
     newApplicationInsightsName: resourceNames.outputs.appInsightsName
     location: location
+    retentionInDays: logRetentionInDays
     tags: tags
   }
 }
