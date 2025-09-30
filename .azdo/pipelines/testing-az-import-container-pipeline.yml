@@ -33,6 +33,8 @@ variables:
       - template: vars/var-dev.yml
   - ${{ if eq(lower(parameters.runEnvironment), 'qa') }}:
       - template: vars/var-qa.yml
+  - ${{ if eq(lower(parameters.runEnvironment), 'prod') }}:
+      - template: vars/var-prod.yml
   - name: acrName
     value: XXXlabelcrdev
   - name: sourceAcrName
