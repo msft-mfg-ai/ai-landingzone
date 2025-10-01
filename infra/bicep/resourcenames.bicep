@@ -129,7 +129,7 @@ output project_vm object = {
   vm_os_disk_name:                           toLower('${resourceAbbreviations.computeDisks}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
   vm_nsg_name:                               toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
   bastion_host_name:                         toLower('${resourceAbbreviations.networkBastionHosts}${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
-  bastion_pip_name:                          toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}${dashInstance}${dashProject}')
+  bastion_pip_name:                          toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}${dashProject}')
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
