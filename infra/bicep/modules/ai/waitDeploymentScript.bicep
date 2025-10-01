@@ -10,8 +10,11 @@ param seconds int
 param utcValue string = utcNow()
 
 param userManagedIdentityId string = ''
+param addCapHostDelayScripts bool = true
+// param storageAccountName string = ''
+// param storageAccountAccessKey string = ''
 
-resource waitScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
+resource waitScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = if (addCapHostDelayScripts) {
   name: name
   location: location
   kind: 'AzurePowerShell'
@@ -20,6 +23,7 @@ resource waitScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
     userAssignedIdentities: { '${ userManagedIdentityId }': {} }
   }
   properties: {
+    // storageAccountSettings: { storageAccountName: storageAccountName, storageAccountAccessKey: storageAccountAccessKey }  Note: this doesn't work without the access key...
     azPowerShellVersion: '11.0'
     forceUpdateTag: utcValue
     retentionInterval: 'PT1H'
