@@ -32,11 +32,11 @@ on:
         required: false
         default: false
         type: boolean
-      # updateACRFirewall:
-      #   description: Update ACR Firewall
-      #   required: false
-      #   default: false
-      #   type: boolean
+      updateACRFirewall:
+        description: Update ACR Firewall
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   id-token: write
@@ -147,7 +147,7 @@ jobs:
 
       ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
       ACR_REPO_NAME: ${{ needs.template-env.outputs.ACR_REPO_NAME }}
-      ACR_FW_UPDATE: false #  $ { {  inputs.updateACRFirewall } }
+      ACR_FW_UPDATE: ${{ inputs.updateACRFirewall }}
 
       APP_PATH: ${{ needs.template-env.outputs.UI_APP_PATH }}
       ACR_APP_NAME: ${{ needs.template-env.outputs.UI_ACR_APP_NAME }}
